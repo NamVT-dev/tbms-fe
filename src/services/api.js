@@ -67,9 +67,9 @@ export const userService = {
 };
 
 export function getTours() {
-  return axios.get(`${process.env.REACT_APP_API_URL}tours`);
+  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours`);
 }
 
 export function getTourBySlug(slug) {
-  return axios.get(`${process.env.REACT_APP_API_URL}tours/${slug}`);
+  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours/${slug}`);
 }
