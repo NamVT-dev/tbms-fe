@@ -9,8 +9,8 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   UserIcon,
-  ExclamationTriangleIcon
-} from '@heroicons/react/24/outline';
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
 
 export default function PendingTours() {
   const [tours, setTours] = useState([]);
@@ -25,13 +25,16 @@ export default function PendingTours() {
   const [totalPages, setTotalPages] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState(null);
-  const [actionType, setActionType] = useState(''); // 'approve' or 'reject'
+  const [actionType, setActionType] = useState(""); // 'approve' or 'reject'
   const [processing, setProcessing] = useState(false);
 
   const getAllTours = useCallback(async () => {
     try {
       const res = await axios.get(
-        `http://localhost:9999/api/admin/pendingTour?limit=1000`
+        `http://localhost:9999/admin/pendingTour?limit=1000`,
+        {
+          withCredentials: true,
+        }
       );
       if (res.data && res.data.status === "success") {
         setAllTours(res.data.data.tours || []);
@@ -51,19 +54,22 @@ export default function PendingTours() {
     try {
       const params = new URLSearchParams({
         page: page,
-        limit: limit
+        limit: limit,
       });
-      
+
       if (search.trim()) {
-        params.append('search', search.trim());
+        params.append("search", search.trim());
       }
-      
+
       if (partner) {
-        params.append('partner', partner);
+        params.append("partner", partner);
       }
 
       const res = await axios.get(
-        `http://localhost:9999/api/admin/pendingTour?${params.toString()}`
+        `http://localhost:9999/admin/pendingTour?${params.toString()}`,
+        {
+          withCredentials: true,
+        }
       );
 
       if (res.data && res.data.status === "success") {
@@ -71,14 +77,14 @@ export default function PendingTours() {
         setTotal(res.data.total || 0);
         setTotalPages(res.data.totalPages || 1);
       } else {
-        throw new Error('Không nhận được dữ liệu từ server');
+        throw new Error("Không nhận được dữ liệu từ server");
       }
     } catch (err) {
       console.error("Lỗi khi lấy danh sách tour:", err);
       setError(
-        err.response?.data?.message || 
-        err.message || 
-        "Có lỗi xảy ra khi tải dữ liệu"
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi tải dữ liệu"
       );
       setTours([]);
       setTotal(0);
@@ -87,8 +93,10 @@ export default function PendingTours() {
     }
   }, [page, limit, search, partner]);
 
-  const uniquePartners = [...new Set(allTours.map(tour => tour.partner._id))].map(partnerId => {
-    const tour = allTours.find(t => t.partner._id === partnerId);
+  const uniquePartners = [
+    ...new Set(allTours.map((tour) => tour.partner._id)),
+  ].map((partnerId) => {
+    const tour = allTours.find((t) => t.partner._id === partnerId);
     return tour.partner;
   });
 
@@ -103,7 +111,7 @@ export default function PendingTours() {
     const searchHandler = () => {
       debouncedSearch(getTours);
     };
-    
+
     searchHandler();
 
     return () => {
@@ -112,14 +120,14 @@ export default function PendingTours() {
   }, [getTours, debouncedSearch]);
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(price);
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   const handleAction = async (decision) => {
@@ -127,20 +135,25 @@ export default function PendingTours() {
     setProcessing(true);
     try {
       await axios.patch(
-        `http://localhost:9999/api/admin/pendingTour/${selectedTour._id}/approve`,
-        { decision: decision === 'approve' ? 'active' : 'inactive' }
+        `http://localhost:9999/admin/pendingTour/${selectedTour._id}/approve`,
+        { decision: decision === "approve" ? "active" : "inactive" },
+        {
+          withCredentials: true,
+        }
       );
       await getTours();
       await getAllTours();
-      alert(decision === 'approve' ? 'Tour đã được phê duyệt' : 'Tour đã bị từ chối');
+      alert(
+        decision === "approve" ? "Tour đã được phê duyệt" : "Tour đã bị từ chối"
+      );
     } catch (err) {
       console.error("Lỗi khi xử lý tour:", err);
-      alert(err.response?.data?.message || 'Có lỗi xảy ra khi xử lý yêu cầu');
+      alert(err.response?.data?.message || "Có lỗi xảy ra khi xử lý yêu cầu");
     } finally {
       setProcessing(false);
       setIsModalOpen(false);
       setSelectedTour(null);
-      setActionType('');
+      setActionType("");
     }
   };
 
@@ -173,7 +186,9 @@ export default function PendingTours() {
     <div className="p-6">
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Quản lý Tour chờ duyệt</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Quản lý Tour chờ duyệt
+          </h1>
           <p className="mt-2 text-sm text-gray-700">
             Danh sách các tour đang chờ được phê duyệt.
           </p>
@@ -188,7 +203,9 @@ export default function PendingTours() {
               <ClockIcon className="w-6 h-6 text-yellow-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tổng tour chờ duyệt</p>
+              <p className="text-sm font-medium text-gray-600">
+                Tổng tour chờ duyệt
+              </p>
               <p className="text-2xl font-semibold text-gray-900">{total}</p>
             </div>
           </div>
@@ -269,15 +286,19 @@ export default function PendingTours() {
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-20 w-20">
-                        <img 
-                          className="h-20 w-20 rounded-lg object-cover" 
-                          src={`/img/tours/${tour.imageCover}`} 
+                        <img
+                          className="h-20 w-20 rounded-lg object-cover"
+                          src={`/img/tours/${tour.imageCover}`}
                           alt={tour.name}
                         />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{tour.name}</div>
-                        <div className="text-sm text-gray-500">{tour.summary}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {tour.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {tour.summary}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -290,8 +311,12 @@ export default function PendingTours() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">{tour.partner.name}</div>
-                    <div className="text-sm text-gray-500">{tour.partner.email}</div>
+                    <div className="text-sm text-gray-900">
+                      {tour.partner.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {tour.partner.email}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">
@@ -299,15 +324,15 @@ export default function PendingTours() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button 
+                    <button
                       className="text-green-600 hover:text-green-900 mr-3"
-                      onClick={() => openConfirmModal(tour, 'approve')}
+                      onClick={() => openConfirmModal(tour, "approve")}
                     >
                       <CheckCircleIcon className="h-5 w-5" />
                     </button>
-                    <button 
+                    <button
                       className="text-red-600 hover:text-red-900"
-                      onClick={() => openConfirmModal(tour, 'reject')}
+                      onClick={() => openConfirmModal(tour, "reject")}
                     >
                       <XCircleIcon className="h-5 w-5" />
                     </button>
@@ -332,7 +357,7 @@ export default function PendingTours() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={page === 1}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
@@ -342,7 +367,7 @@ export default function PendingTours() {
             Trang {page} / {totalPages}
           </div>
           <button
-            onClick={() => setPage(prev => prev + 1)}
+            onClick={() => setPage((prev) => prev + 1)}
             disabled={page >= totalPages}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
@@ -356,7 +381,7 @@ export default function PendingTours() {
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             {/* Background overlay */}
-            <div 
+            <div
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => !processing && setIsModalOpen(false)}
             ></div>
@@ -365,17 +390,22 @@ export default function PendingTours() {
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <div className="sm:flex sm:items-start">
                 <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600" aria-hidden="true" />
+                  <ExclamationTriangleIcon
+                    className="h-6 w-6 text-yellow-600"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <h3 className="text-lg leading-6 font-medium text-gray-900">
-                    {actionType === 'approve' ? 'Xác nhận phê duyệt' : 'Xác nhận từ chối'}
+                    {actionType === "approve"
+                      ? "Xác nhận phê duyệt"
+                      : "Xác nhận từ chối"}
                   </h3>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      {actionType === 'approve'
-                        ? 'Bạn có chắc chắn muốn phê duyệt tour này không?'
-                        : 'Bạn có chắc chắn muốn từ chối tour này không?'}
+                      {actionType === "approve"
+                        ? "Bạn có chắc chắn muốn phê duyệt tour này không?"
+                        : "Bạn có chắc chắn muốn từ chối tour này không?"}
                     </p>
                     {selectedTour && (
                       <p className="mt-2 text-sm font-medium text-gray-900">
@@ -390,13 +420,17 @@ export default function PendingTours() {
                   type="button"
                   disabled={processing}
                   className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm ${
-                    actionType === 'approve'
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-red-600 hover:bg-red-700'
-                  } ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    actionType === "approve"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  } ${processing ? "opacity-50 cursor-not-allowed" : ""}`}
                   onClick={() => handleAction(actionType)}
                 >
-                  {processing ? 'Đang xử lý...' : actionType === 'approve' ? 'Phê duyệt' : 'Từ chối'}
+                  {processing
+                    ? "Đang xử lý..."
+                    : actionType === "approve"
+                    ? "Phê duyệt"
+                    : "Từ chối"}
                 </button>
                 <button
                   type="button"
@@ -413,4 +447,4 @@ export default function PendingTours() {
       )}
     </div>
   );
-} 
+}

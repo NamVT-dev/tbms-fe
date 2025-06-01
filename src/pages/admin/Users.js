@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { debounce } from "lodash";
-import { 
+import {
   UserGroupIcon,
   UserIcon,
   UsersIcon,
   NoSymbolIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  UserPlusIcon
-} from '@heroicons/react/24/outline';
+  UserPlusIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -23,9 +23,9 @@ export default function Users() {
   const [error, setError] = useState(null);
   const [showCreatePartnerModal, setShowCreatePartnerModal] = useState(false);
   const [partnerForm, setPartnerForm] = useState({
-    name: '',
-    email: '',
-    description: ''
+    name: "",
+    email: "",
+    description: "",
   });
   const [createLoading, setCreateLoading] = useState(false);
 
@@ -35,23 +35,26 @@ export default function Users() {
     try {
       const params = new URLSearchParams({
         page: page,
-        limit: limit
+        limit: limit,
       });
-      
+
       if (search.trim()) {
-        params.append('search', search.trim());
+        params.append("search", search.trim());
       }
-      
+
       if (role) {
-        params.append('role', role);
+        params.append("role", role);
       }
-      
+
       if (status) {
-        params.append('status', status);
+        params.append("status", status);
       }
 
       const res = await axios.get(
-        `http://localhost:9999/api/admin/users?${params.toString()}`
+        `http://localhost:9999/admin/users?${params.toString()}`,
+        {
+          withCredentials: true,
+        }
       );
 
       if (res.data && res.data.status === "success") {
@@ -59,14 +62,14 @@ export default function Users() {
         setTotal(res.data.total || 0);
         console.log(res.data);
       } else {
-        throw new Error('Không nhận được dữ liệu từ server');
+        throw new Error("Không nhận được dữ liệu từ server");
       }
     } catch (err) {
       console.error("Lỗi khi lấy danh sách người dùng:", err);
       setError(
-        err.response?.data?.message || 
-        err.message || 
-        "Có lỗi xảy ra khi tải dữ liệu"
+        err.response?.data?.message ||
+          err.message ||
+          "Có lỗi xảy ra khi tải dữ liệu"
       );
       setUsers([]);
       setTotal(0);
@@ -86,7 +89,7 @@ export default function Users() {
     const searchHandler = () => {
       debouncedSearch(getUsers);
     };
-    
+
     searchHandler();
 
     return () => {
@@ -99,20 +102,25 @@ export default function Users() {
     setCreateLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:9999/api/admin/createPartner',
-        partnerForm
+        "http://localhost:9999/admin/createPartner",
+        partnerForm,
+        {
+          withCredentials: true,
+        }
       );
-      
+
       if (response.data && response.data.status === "success") {
-        alert('Tạo tài khoản đối tác thành công!');
+        alert("Tạo tài khoản đối tác thành công!");
         setShowCreatePartnerModal(false);
-        setPartnerForm({ name: '', email: '', description: '' });
+        setPartnerForm({ name: "", email: "", description: "" });
         // Refresh the users list
         getUsers();
       }
     } catch (err) {
       console.error("Lỗi khi tạo tài khoản đối tác:", err);
-      alert(err.response?.data?.message || 'Có lỗi xảy ra khi tạo tài khoản đối tác');
+      alert(
+        err.response?.data?.message || "Có lỗi xảy ra khi tạo tài khoản đối tác"
+      );
     } finally {
       setCreateLoading(false);
     }
@@ -141,7 +149,9 @@ export default function Users() {
     <div className="p-6">
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Quản lý người dùng</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Quản lý người dùng
+          </h1>
           <p className="mt-2 text-sm text-gray-700">
             Danh sách tất cả người dùng trong hệ thống.
           </p>
@@ -165,12 +175,13 @@ export default function Users() {
               <UsersIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Tổng người dùng</p>
+              <p className="text-sm font-medium text-gray-600">
+                Tổng người dùng
+              </p>
               <p className="text-2xl font-semibold text-gray-900">{total}</p>
             </div>
           </div>
         </div>
-        
 
         {/* <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
@@ -292,7 +303,9 @@ export default function Users() {
                         <UserIcon className="h-8 w-8 text-gray-400" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.name}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -303,18 +316,22 @@ export default function Users() {
                     <div className="text-sm text-gray-500">{user.role}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.active === true
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.active ? 'Active' : 'Inactive'}
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.active === true
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {user.active ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button 
+                    <button
                       className="text-red-600 hover:text-red-900"
-                      onClick={() => {/* Thêm xử lý chặn */}}
+                      onClick={() => {
+                        /* Thêm xử lý chặn */
+                      }}
                     >
                       <NoSymbolIcon className="h-5 w-5" />
                     </button>
@@ -338,17 +355,15 @@ export default function Users() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => setPage(prev => Math.max(1, prev - 1))}
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={page === 1}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
             Trước
           </button>
-          <div className="flex items-center px-4">
-            Trang {page}
-          </div>
+          <div className="flex items-center px-4">Trang {page}</div>
           <button
-            onClick={() => setPage(prev => prev + 1)}
+            onClick={() => setPage((prev) => prev + 1)}
             disabled={users.length < limit}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
           >
@@ -362,7 +377,7 @@ export default function Users() {
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             {/* Background overlay */}
-            <div 
+            <div
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => !createLoading && setShowCreatePartnerModal(false)}
             ></div>
@@ -371,7 +386,10 @@ export default function Users() {
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
               <div className="sm:flex sm:items-start">
                 <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
-                  <UserPlusIcon className="h-6 w-6 text-indigo-600" aria-hidden="true" />
+                  <UserPlusIcon
+                    className="h-6 w-6 text-indigo-600"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                   <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -380,7 +398,10 @@ export default function Users() {
                   <div className="mt-2">
                     <form onSubmit={handleCreatePartner} className="space-y-4">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="name"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Tên đối tác
                         </label>
                         <input
@@ -389,12 +410,20 @@ export default function Users() {
                           id="name"
                           required
                           value={partnerForm.name}
-                          onChange={(e) => setPartnerForm({...partnerForm, name: e.target.value})}
+                          onChange={(e) =>
+                            setPartnerForm({
+                              ...partnerForm,
+                              name: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Email
                         </label>
                         <input
@@ -403,12 +432,20 @@ export default function Users() {
                           id="email"
                           required
                           value={partnerForm.email}
-                          onChange={(e) => setPartnerForm({...partnerForm, email: e.target.value})}
+                          onChange={(e) =>
+                            setPartnerForm({
+                              ...partnerForm,
+                              email: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
                       <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="description"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Mô tả
                         </label>
                         <textarea
@@ -417,7 +454,12 @@ export default function Users() {
                           required
                           rows={3}
                           value={partnerForm.description}
-                          onChange={(e) => setPartnerForm({...partnerForm, description: e.target.value})}
+                          onChange={(e) =>
+                            setPartnerForm({
+                              ...partnerForm,
+                              description: e.target.value,
+                            })
+                          }
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                       </div>
@@ -426,15 +468,17 @@ export default function Users() {
                           type="submit"
                           disabled={createLoading}
                           className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm ${
-                            createLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            createLoading ? "opacity-50 cursor-not-allowed" : ""
                           }`}
                         >
-                          {createLoading ? 'Đang tạo...' : 'Tạo tài khoản'}
+                          {createLoading ? "Đang tạo..." : "Tạo tài khoản"}
                         </button>
                         <button
                           type="button"
                           className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
-                          onClick={() => !createLoading && setShowCreatePartnerModal(false)}
+                          onClick={() =>
+                            !createLoading && setShowCreatePartnerModal(false)
+                          }
                           disabled={createLoading}
                         >
                           Hủy

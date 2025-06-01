@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       if (res.data.status === "success") {
         setUser(res.data.data.user);
         localStorage.setItem("user", JSON.stringify(res.data.data.user));
-        return true;
+        return res.data.data.user;
       }
     } catch (err) {
       throw new Error(err.response?.data?.message || "Không thể đăng nhập");

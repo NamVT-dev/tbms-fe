@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import "../../styles/login.css";
@@ -17,11 +17,27 @@ const SignUpForm = () => {
       alert("Mật khẩu không trùng khớp!");
       return;
     }
-    const success = await signup(name, email, password, confirmPassword);
-    if (success) navigate("/");
+    await signup(name, email, password, confirmPassword);
   };
 
-  if (user) navigate("/");
+  useEffect(() => {
+    if (user) {
+      switch (user.role?.trim().toLowerCase()) {
+        case "admin":
+          navigate("/admin");
+          break;
+        case "customer":
+          navigate("/");
+          break;
+        case "partner":
+          navigate("/partner/dashboard");
+          break;
+        default:
+          navigate("/");
+          break;
+      }
+    }
+  }, [user, navigate]);
 
   return (
     <div className="login-container">

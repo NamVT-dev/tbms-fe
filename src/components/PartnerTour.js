@@ -11,22 +11,13 @@ const PartnerTour = () => {
   useEffect(() => {
     const fetchTours = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("Bạn chưa đăng nhập!");
-          return;
-        }
-
-        const response = await fetch(
-          "http://localhost:9999/api/auth/tour/partner",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch("http://localhost:9999/tours/partner", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
 
         const data = await response.json();
         if (response.ok) {
@@ -54,17 +45,13 @@ const PartnerTour = () => {
     if (!confirmDelete) return;
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:9999/api/auth/tour/${tourId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:9999/tours/${tourId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
 
       const data = await response.json();
 
