@@ -1,7 +1,8 @@
 import logo from "../../assets/fvivu.png";
-const header = () => {
+
+const Header = () => {
   return (
-    <header className="bg-white text-black py-4 px-12 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white text-black py-4 px-12 shadow-sm">
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Left Section: Logo and Navigation */}
         <div className="flex items-center gap-10 h-full">
@@ -11,7 +12,7 @@ const header = () => {
               <img
                 src={logo}
                 alt="fvivu Logo"
-                className=" w-28 object-contain transition-transform duration-300"
+                className="w-28 object-contain transition-transform duration-300"
               />
             </a>
           </div>
@@ -36,7 +37,7 @@ const header = () => {
           </nav>
         </div>
 
-        {/* Right Section: Hotline, Contact Button, Mobile Menu */}
+        {/* Right Section: Hotline, Auth Buttons, Mobile Menu */}
         <div className="flex items-center gap-4">
           {/* Hotline */}
           <div className="flex items-center">
@@ -54,10 +55,21 @@ const header = () => {
             </a>
           </div>
 
-          {/* Contact Button */}
-          <button className="hidden md:block bg-cyan-400 text-white font-medium py-2 px-4 rounded-2xl hover:bg-cyan-500 transition-colors text-base">
-            Liên hệ Fvivu
-          </button>
+          {/* Auth Buttons */}
+          <div className="hidden md:flex gap-3">
+            <a
+              href="/register"
+              className="bg-cyan-400 text-white font-medium py-2 px-4 rounded-2xl hover:bg-cyan-500 transition-colors text-base"
+            >
+              Đăng ký
+            </a>
+            <a
+              href="/login"
+              className="border border-cyan-400 text-cyan-400 font-medium py-2 px-4 rounded-2xl hover:bg-cyan-50 transition-colors text-base"
+            >
+              Đăng nhập
+            </a>
+          </div>
 
           {/* Mobile Menu Icon */}
           <div className="md:hidden">
@@ -99,4 +111,5 @@ const header = () => {
     </header>
   );
 };
-export default header;
+
+export default Header;
