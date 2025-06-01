@@ -17,16 +17,7 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-axios.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+
 export const authService = {
   login: (email, password) =>
     axios.post(
@@ -57,36 +48,20 @@ export const authService = {
 
 export const userService = {
   getMe: () =>
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}user/me`, {
-      headers: {
-        "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": true,
-        //Authorization:"Bearer "+ localStorage.getItem('token')
-      },
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/profile`, {
+      withCredentials: true,
     }),
-  updateMe: (data) =>
-    axios.patch(`${process.env.REACT_APP_BACKEND_URL}user/updateMe`, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
-  updatePassword: (passwordCurrent, password, passwordConfirm) =>
-    axios.patch(`${process.env.REACT_APP_BACKEND_URL}user/updateMyPassword`, {
-      passwordCurrent,
-      password,
-      passwordConfirm,
-    }),
-};
 
-export const bookingService = {
-  getCheckoutSession: (tourId) =>
-    axios.get(
-      `${process.env.REACT_APP_BACKEND_URL}bookings/checkout-session/${tourId}`,
+  updatePassword: (passwordCurrent, password, passwordConfirm) =>
+    axios.patch(
+      `${process.env.REACT_APP_BACKEND_URL}auth/updatePassword`,
       {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token"),
-          "ngrok-skip-browser-warning": true,
-        },
+        passwordCurrent,
+        password,
+        passwordConfirm,
+      },
+      {
+        withCredentials: true,
       }
     ),
-  getMyBookings: () =>
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}bookings/my-tours`),
 };
