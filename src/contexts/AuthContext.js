@@ -22,10 +22,11 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.login(email, password);
       if (res.data.status === "success") {
         setUser(res.data.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.data.user));
         return true;
       }
     } catch (err) {
-      return Error(err.response?.data?.message || "Không thể đăng nhập");
+      throw new Error(err.response?.data?.message || "Không thể đăng nhập");
     }
   };
 
@@ -43,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         return true;
       }
     } catch (err) {
-      return Error(err.response?.data?.message || "Không thể đăng kí");
+      throw new Error(err.response?.data?.message || "Không thể đăng kí");
     }
   };
 
@@ -55,7 +56,7 @@ export const AuthProvider = ({ children }) => {
       navigate("/");
       return true;
     } catch (err) {
-      return Error("Không thể đăng xuất");
+      throw new Error("Không thể đăng xuất");
     }
   };
 

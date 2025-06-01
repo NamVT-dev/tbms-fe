@@ -6,7 +6,7 @@ import "../../styles/login.css";
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,6 +14,8 @@ const LoginForm = () => {
     const success = await login(email, password);
     if (success) navigate("/");
   };
+
+  if (user) navigate("/");
 
   return (
     <div className="login-container">

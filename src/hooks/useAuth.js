@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuthContext } from "../contexts/AuthContext";
 
 export const useAuth = () => {
-  const { login, logout, signup } = useAuthContext();
+  const { login, logout, signup, user } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -42,6 +42,7 @@ export const useAuth = () => {
     login: handleLogin,
     logout: handleLogout,
     signup: handleSignUp,
+    user,
     isLoading,
     error,
   };

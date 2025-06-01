@@ -8,7 +8,7 @@ const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { signup, isLoading, error } = useAuth();
+  const { signup, isLoading, error, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -20,6 +20,8 @@ const SignUpForm = () => {
     const success = await signup(name, email, password, confirmPassword);
     if (success) navigate("/");
   };
+
+  if (user) navigate("/");
 
   return (
     <div className="login-container">

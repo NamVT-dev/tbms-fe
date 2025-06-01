@@ -1,4 +1,30 @@
+import { useEffect, useRef, useState } from "react";
+import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 const Header = () => {
+  const { user, logout } = useAuth();
+  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) navigate("/");
+  };
   return (
     <header className="sticky top-0 z-50 bg-white text-black py-4 px-12 shadow-sm">
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -54,20 +80,51 @@ const Header = () => {
           </div>
 
           {/* Auth Buttons */}
-          <div className="hidden md:flex gap-3">
-            <a
-              href="/register"
-              className="bg-cyan-400 text-white font-medium py-2 px-4 rounded-2xl hover:bg-cyan-500 transition-colors text-base"
-            >
-              Đăng ký
-            </a>
-            <a
-              href="/login"
-              className="border border-cyan-400 text-cyan-400 font-medium py-2 px-4 rounded-2xl hover:bg-cyan-50 transition-colors text-base"
-            >
-              Đăng nhập
-            </a>
-          </div>
+          {!user ? (
+            <div className="hidden md:flex gap-3">
+              <a
+                href="/register"
+                className="bg-cyan-400 text-white font-medium py-2 px-4 rounded-2xl hover:bg-cyan-500 transition-colors text-base"
+              >
+                Đăng ký
+              </a>
+              <a
+                href="/login"
+                className="border border-cyan-400 text-cyan-400 font-medium py-2 px-4 rounded-2xl hover:bg-cyan-50 transition-colors text-base"
+              >
+                Đăng nhập
+              </a>
+            </div>
+          ) : (
+            <div ref={menuRef} className="relative hidden md:flex items-center">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="flex items-center gap-2 focus:outline-none"
+              >
+                <img
+                  src={user.photo || "/default-avatar.png"}
+                  alt="Avatar"
+                  className="w-10 h-10 rounded-full object-cover border"
+                />
+              </button>
+              {showMenu && (
+                <div className="absolute right-0 top-12 w-40 bg-white border rounded-lg shadow-lg z-50">
+                  <a
+                    href="/profile"
+                    className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Hồ sơ
+                  </a>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Mobile Menu Icon */}
           <div className="md:hidden">

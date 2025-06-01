@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import UserProfile from "../pages/UserProfile";
 
 const MainLayout = lazy(() => import("../layouts/MainLayout"));
 const HomePage = lazy(() => import("../pages/HomePage"));
@@ -14,6 +15,7 @@ const customerRoutes = {
     { path: "tour-details/:slug", element: <TourDetailPage /> },
     { path: "login", element: <LoginForm /> },
     { path: "register", element: <SignUpForm /> },
+    { path: "profile", element: <UserProfile /> },
     // thêm các route khác ở đây
   ],
 };
