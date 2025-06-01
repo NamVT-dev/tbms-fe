@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "../../assets/fvivu.png"; // thay bằng logo của bạn // logo "ĐÃ THÔNG BÁO"
+import logo from "../../assets/fvivu.png";
 
 const Footer = () => {
   return (
