@@ -9,7 +9,7 @@ const MainLayout = () => {
       <Header />
 
       {/* Main Content Section */}
-      <main className="container mx-auto px-16 py-8">
+      <main className="w-full">
         <Outlet />
       </main>
 

@@ -1,4 +1,3 @@
-import logo from "../../assets/fvivu.png";
 const header = () => {
   return (
     <header className="bg-white text-black py-4 px-12 shadow-sm">
@@ -9,7 +8,7 @@ const header = () => {
           <div>
             <a href="/">
               <img
-                src={logo}
+                src="/assets/fvivu.png"
                 alt="fvivu Logo"
                 className=" w-28 object-contain transition-transform duration-300"
               />
