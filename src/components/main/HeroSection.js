@@ -50,7 +50,7 @@ const HeroSection = () => {
                   </svg>
                   <input
                     type="text"
-                    placeholder="Nhập tên du thuyền"
+                    placeholder="Nhập tên địa điểm"
                     className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400"
                   />
                 </label>
@@ -75,6 +75,11 @@ const HeroSection = () => {
                   </svg>
                   <select className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none">
                     <option>Tất cả địa điểm</option>
+                    <option>Hạ Long</option>
+                    <option>Đà Nẵng</option>
+                    <option>Phú Quốc</option>
+                    <option>Hội An</option>
+                    <option>Huế</option>
                   </select>
                   <svg
                     className="h-6 w-6 mr-3 text-gray-500"
@@ -112,6 +117,10 @@ const HeroSection = () => {
                   </svg>
                   <select className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none">
                     <option>Tất cả mức giá</option>
+                    <option value="0-500">Dưới 500k</option>
+                    <option value="500-1000">500k - 1 triệu</option>
+                    <option value="1000-9999">Trên 1 triệu</option>
+                    <option value="10000-99999">Trên 10 triệu</option>
                   </select>
                   <svg
                     className="h-6 w-6 mr-3 text-gray-500"
@@ -144,7 +153,7 @@ const HeroSection = () => {
             {/* Left Column: Title */}
             <div className="flex-1 flex flex-col gap-4">
               <h2 className="text-3xl md:text-4xl text-left font-bold text-gray-900">
-                Du thuyền mới và phổ biến nhất
+                Tours mới và phổ biến nhất
               </h2>
               <div className="w-16 h-1 bg-cyan-400"></div>
             </div>
@@ -152,10 +161,11 @@ const HeroSection = () => {
             {/* Right Column: Description */}
             <div className="flex-1">
               <p className="text-lg text-gray-700 text-left">
-                Tận hưởng sự xa hoa và đẳng cấp tối đa trên du thuyền mới nhất
-                và phổ biến nhất. Khám phá một hành trình tuyệt vời đưa bạn vào
-                thế giới của sự sang trọng, tiện nghi và trải nghiệm không thể
-                quên.
+                Hãy sẵn sàng cho một hành trình du lịch đỉnh cao trên du thuyền
+                sang trọng bậc nhất hiện nay. Tour du lịch của chúng tôi mang
+                đến cho bạn cơ hội tận hưởng không gian xa hoa, dịch vụ chuẩn 5
+                sao và những tiện nghi hiện đại giữa khung cảnh thiên nhiên
+                tuyệt đẹp
               </p>
             </div>
           </div>
