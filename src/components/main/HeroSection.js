@@ -1,5 +1,5 @@
 import React from "react";
-
+//import banner from "assets/banner.mp4";
 const HeroSection = () => {
   return (
     <>
@@ -8,7 +8,7 @@ const HeroSection = () => {
         <div className="absolute top-0 left-0 w-full h-full rounded-2xl overflow-hidden">
           <video
             className="w-full h-full object-cover"
-            src="https://minio.fares.vn/mixivivu-dev/video/Mixivivuduthuyen.mp4"
+            src="assets/banner.mp4"
             autoPlay
             playsInline
             loop
@@ -22,10 +22,10 @@ const HeroSection = () => {
             {/* Title and Description */}
             <div className="flex flex-col gap-4 text-center">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Bạn lựa chọn du thuyền Hạ Long nào?
+                Bạn lựa chọn chuyến đi nào?
               </h1>
               <p className="text-lg text-gray-700">
-                Hơn 100 tour du thuyền hạng sang giá tốt đang chờ bạn
+                Hàng trăm tour du lịch hạng sang giá tốt đang chờ bạn
               </p>
             </div>
 
