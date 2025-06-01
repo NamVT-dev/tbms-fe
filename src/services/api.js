@@ -65,3 +65,11 @@ export const userService = {
       }
     ),
 };
+
+export function getTours() {
+  return axios.get(`${process.env.REACT_APP_API_URL}tours`);
+}
+
+export function getTourBySlug(slug) {
+  return axios.get(`${process.env.REACT_APP_API_URL}tours/${slug}`);
+}
