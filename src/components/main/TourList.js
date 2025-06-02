@@ -23,7 +23,7 @@ const TourList = () => {
               {/* Image */}
               <div className="relative p-4">
                 <img
-                  src={tour?.image || "/thuyen1.png"}
+                  src={tour?.imageCover || "/thuyen1.png"}
                   alt={tour?.name || "Du thuyền"}
                   className="w-full h-[216px] object-cover rounded-2xl"
                 />

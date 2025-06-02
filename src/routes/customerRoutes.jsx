@@ -12,7 +12,7 @@ const customerRoutes = {
   element: <MainLayout />,
   children: [
     { index: true, element: <HomePage /> },
-    { path: "tour-details/:slug", element: <TourDetailPage /> },
+    { path: "tour-detail/:slug", element: <TourDetailPage /> },
     { path: "login", element: <LoginForm /> },
     { path: "register", element: <SignUpForm /> },
     { path: "profile", element: <UserProfile /> },
