@@ -288,7 +288,7 @@ export default function PendingTours() {
                       <div className="flex-shrink-0 h-20 w-20">
                         <img
                           className="h-20 w-20 rounded-lg object-cover"
-                          src={`/img/tours/${tour.imageCover}`}
+                          src={tour.imageCover}
                           alt={tour.name}
                         />
                       </div>
