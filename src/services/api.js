@@ -43,7 +43,10 @@ export const authService = {
         withCredentials: true,
       }
     ),
-  logout: () => axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/logout`),
+  logout: () =>
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/logout`, {
+      withCredentials: true,
+    }),
 };
 
 export const userService = {

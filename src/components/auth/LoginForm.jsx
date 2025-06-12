@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import "../../styles/login.css";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +15,10 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (user) {
+      if (!user.active) {
+        navigate("/confirmEmail");
+        return;
+      }
       switch (user.role?.trim().toLowerCase()) {
         case "admin":
           navigate("/admin");
@@ -34,12 +37,20 @@ const LoginForm = () => {
   }, [user, navigate]);
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2 className="login-title">ĐĂNG NHẬP</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Tài khoản Email</label>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md text-center">
+        <h2 className="text-teal-400 mb-6 text-xl uppercase font-semibold">
+          ĐĂNG NHẬP
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="text-left">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Tài khoản Email
+            </label>
             <input
               type="email"
               id="email"
@@ -47,10 +58,17 @@ const LoginForm = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
+              className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Mật khẩu</label>
+
+          <div className="text-left">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Mật khẩu
+            </label>
             <input
               type="password"
               id="password"
@@ -58,10 +76,17 @@ const LoginForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
+              className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
             />
           </div>
-          {error && <div className="error">{error}</div>}
-          <button className="login-button" type="submit" disabled={isLoading}>
+
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+
+          <button
+            className="w-full bg-teal-400 text-white py-3 rounded-full font-bold disabled:opacity-70"
+            type="submit"
+            disabled={isLoading}
+          >
             {isLoading ? "Đang tải..." : "ĐĂNG NHẬP"}
           </button>
         </form>
