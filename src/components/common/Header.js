@@ -9,6 +9,12 @@ const Header = () => {
   const menuRef = useRef(null);
 
   useEffect(() => {
+    if (user && !user.active) {
+      navigate("/confirm-email");
+    }
+  }, [navigate, user]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);

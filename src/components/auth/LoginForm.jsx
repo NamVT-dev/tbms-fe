@@ -16,7 +16,7 @@ const LoginForm = () => {
   useEffect(() => {
     if (user) {
       if (!user.active) {
-        navigate("/confirmEmail");
+        navigate("/confirm-email");
         return;
       }
       switch (user.role?.trim().toLowerCase()) {
