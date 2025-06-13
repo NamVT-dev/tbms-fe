@@ -17,13 +17,13 @@ const SignUpForm = () => {
       return;
     }
     if (await signup(name, email, password, confirmPassword))
-      navigate("/confirmEmail");
+      navigate("/confirm-email");
   };
 
   useEffect(() => {
     if (user) {
       if (!user.active) {
-        navigate("/confirmEmail");
+        navigate("/confirm-email");
         return;
       }
       switch (user.role?.trim().toLowerCase()) {

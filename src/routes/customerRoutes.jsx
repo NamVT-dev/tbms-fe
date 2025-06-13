@@ -18,7 +18,7 @@ const customerRoutes = {
     { path: "tour-detail/:slug", element: <TourDetailPage /> },
     { path: "login", element: <LoginForm /> },
     { path: "register", element: <SignUpForm /> },
-    { path: "confirmEmail", element: <ConfirmEmailForm /> },
+    { path: "confirm-email", element: <ConfirmEmailForm /> },
     { path: "profile", element: <UserProfile /> },
     // thêm các route khác ở đây
   ],

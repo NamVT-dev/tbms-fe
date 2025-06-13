@@ -55,11 +55,10 @@ export const authService = {
       withCredentials: true,
     }),
 
-  resendConfirmEmail: () => {
+  resendConfirmEmail: () =>
     axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/resendConfirmEmail`, {
       withCredentials: true,
-    });
-  },
+    }),
 };
 
 export const userService = {
