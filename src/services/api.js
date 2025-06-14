@@ -86,5 +86,5 @@ export function getTours() {
 }
 
 export function getTourBySlug(slug) {
-  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours/slug/${slug}`);
+  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours/detail/${slug}`);
 }
