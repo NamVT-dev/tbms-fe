@@ -59,6 +59,23 @@ export const authService = {
     axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/resendConfirmEmail`, {
       withCredentials: true,
     }),
+
+  forgotPassword: (email) =>
+    axios.post(`${process.env.REACT_APP_BACKEND_URL}auth/forgotPassword`, {
+      email,
+    }),
+
+  resetPassword: (email, token, password, passwordConfirm) =>
+    axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}auth/resetPassword`,
+      {
+        email,
+        token,
+        password,
+        passwordConfirm,
+      },
+      { withCredentials: true }
+    ),
 };
 
 export const userService = {

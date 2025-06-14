@@ -63,6 +63,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const forgotPassword = async (email) => {
+    try {
+      const res = await authService.forgotPassword(email);
+      if (res.data.status === "success") return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message ||
+          "Có vấn đề xảy ra trong quá trình xác nhận!"
+      );
+    }
+  };
+
+  const resetPassword = async (email, token, password, passwordConfirm) => {
+    try {
+      const res = await authService.resetPassword(
+        email,
+        token,
+        password,
+        passwordConfirm
+      );
+      if (res.data.status === "success") return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message || "Không thể đặt lại mật khẩu"
+      );
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -71,6 +99,8 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         logout,
+        forgotPassword,
+        resetPassword,
         isAuthenticated: !!user,
       }}
     >
