@@ -1,6 +1,6 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authService } from "../services/api";
+import { authService, userService } from "../services/api";
 import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
@@ -8,13 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Check if user is already logged in
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    async function fetchUser() {
+      try {
+        const res = await userService.getMe();
+        const user = res.data.data.data;
+        if (user) {
+          setUser(user);
+        }
+        setLoading(false);
+      } catch (error) {}
     }
-    setLoading(false);
+    fetchUser();
   }, []);
 
   const login = async (email, password) => {
@@ -22,7 +28,6 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.login(email, password);
       if (res.data.status === "success") {
         setUser(res.data.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.data.user));
         return res.data.data.user;
       }
     } catch (err) {
@@ -40,7 +45,6 @@ export const AuthProvider = ({ children }) => {
       );
       if (res.data.status === "success") {
         setUser(res.data.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.data.user));
         return true;
       }
     } catch (err) {
@@ -52,7 +56,6 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-      localStorage.removeItem("user");
       navigate("/");
       return true;
     } catch (err) {
