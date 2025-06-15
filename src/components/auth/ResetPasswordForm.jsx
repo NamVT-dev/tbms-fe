@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
-const LoginForm = () => {
-  const [email, setEmail] = useState("");
+const ResetPasswordForm = () => {
   const [password, setPassword] = useState("");
-  const { login, isLoading, error, user } = useAuth();
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+
+  const [searchParams] = useSearchParams();
+
+  const token = searchParams.get("token");
+  const email = searchParams.get("email");
+
+  const { resetPassword, isLoading, error, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    if (await resetPassword(email, token, password, passwordConfirm))
+      window.location.reload();
   };
 
   useEffect(() => {
@@ -40,23 +47,23 @@ const LoginForm = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md text-center">
         <h2 className="text-teal-400 mb-6 text-xl uppercase font-semibold">
-          ĐĂNG NHẬP
+          ĐẶT LẠI MẬT KHẨU
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="text-left">
             <label
-              htmlFor="email"
+              htmlFor="password"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              Tài khoản Email
+              Mật khẩu mới
             </label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               required
               className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
             />
@@ -64,16 +71,16 @@ const LoginForm = () => {
 
           <div className="text-left">
             <label
-              htmlFor="password"
+              htmlFor="passwordConfirm"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              Mật khẩu
+              Xác nhận mật khẩu
             </label>
             <input
               type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="passwordConfirm"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
               placeholder="••••••••"
               required
               className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
@@ -87,22 +94,12 @@ const LoginForm = () => {
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Đang tải..." : "ĐĂNG NHẬP"}
+            {isLoading ? "Đang tải..." : "XÁC NHẬN"}
           </button>
-
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => navigate("/forgot-password")}
-              className="text-sm text-teal-500 hover:underline"
-            >
-              Quên mật khẩu?
-            </button>
-          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default ResetPasswordForm;
