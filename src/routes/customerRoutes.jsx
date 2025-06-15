@@ -9,6 +9,12 @@ const BookingHistoryPage = lazy(() => import("../pages/BookingHistoryPage"));
 const ConfirmEmailForm = lazy(() =>
   import("../components/auth/ConfirmEmailForm")
 );
+const ForgotPasswordForm = lazy(() =>
+  import("../components/auth/ForgotPasswordForm")
+);
+const ResetPasswordForm = lazy(() =>
+  import("../components/auth/ResetPasswordForm")
+);
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 
 const customerRoutes = {
@@ -19,7 +25,9 @@ const customerRoutes = {
     { path: "tour-detail/:slug", element: <TourDetailPage /> },
     { path: "login", element: <LoginForm /> },
     { path: "register", element: <SignUpForm /> },
-    { path: "confirmEmail", element: <ConfirmEmailForm /> },
+    { path: "confirm-email", element: <ConfirmEmailForm /> },
+    { path: "forgot-password", element: <ForgotPasswordForm /> },
+    { path: "reset-password", element: <ResetPasswordForm /> },
     { path: "profile", element: <UserProfile /> },
     { path: "booking-history", element: <BookingHistoryPage /> },
     // thêm các route khác ở đây
