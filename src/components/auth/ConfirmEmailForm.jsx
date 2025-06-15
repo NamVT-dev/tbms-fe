@@ -1,15 +1,36 @@
 import useAuth from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 import { useState, useEffect } from "react";
+import { authService } from "../../services/api";
 
 function ConfirmEmailForm() {
-  const { isLoading, error, user } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [inputPin, setInputPin] = useState("");
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [error, setError] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (!user || user.active) navigate("/");
+  }, [user, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Xử lý xác nhận mã code ở đây
+    try {
+      setConfirmLoading(true);
+      setError("");
+      await authService.confirmEmail(inputPin);
+      window.location.reload();
+    } catch (err) {
+      setError(err.response?.data?.message || "Gặp lỗi khi xác nhận");
+    } finally {
+      setConfirmLoading(false);
+    }
   };
 
   const handleResend = async () => {
@@ -17,13 +38,10 @@ function ConfirmEmailForm() {
       setResendLoading(true);
       setResendMessage("");
 
-      const res = await fetch("/api/v1/auth/resend-confirmation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: user.email }),
-      });
+      const res = await authService.resendConfirmEmail();
 
-      if (!res.ok) throw new Error("Gửi lại mã thất bại. Hãy thử lại sau.");
+      if (res.status !== 200)
+        throw new Error("Gửi lại mã thất bại. Hãy thử lại sau.");
 
       setResendMessage("Mã xác nhận đã được gửi lại email của bạn.");
       setResendCooldown(60); // Bắt đầu đếm ngược 60 giây
@@ -58,14 +76,20 @@ function ConfirmEmailForm() {
               htmlFor="code"
               className="block mb-2 text-sm font-medium text-gray-700"
             >
-              Nhập mã code mà chúng tôi đã gửi tới <strong>{user.email}</strong>
+              Nhập mã code mà chúng tôi đã gửi tới{" "}
+              <strong>{user?.email}</strong>
             </label>
             <input
               type="text"
               id="code"
+              value={inputPin}
+              onChange={(e) => {
+                setInputPin(e.target.value);
+              }}
               placeholder="_ _ _ _ _ _"
               required
               className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
+              maxLength={6}
             />
           </div>
 
@@ -74,9 +98,9 @@ function ConfirmEmailForm() {
           <button
             className="w-full bg-teal-400 text-white py-3 rounded-full font-bold disabled:opacity-70"
             type="submit"
-            disabled={isLoading}
+            disabled={confirmLoading}
           >
-            {isLoading ? "Đang tải..." : "XÁC NHẬN"}
+            {confirmLoading ? "Đang tải..." : "XÁC NHẬN"}
           </button>
         </form>
 

@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
-const LoginForm = () => {
+const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { login, isLoading, error, user } = useAuth();
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const { forgotPassword, isLoading, error, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(email, password);
+    setIsSuccess(false);
+    if (await forgotPassword(email)) setIsSuccess(true);
   };
 
   useEffect(() => {
@@ -40,7 +42,7 @@ const LoginForm = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-10 rounded-lg shadow-lg w-full max-w-md text-center">
         <h2 className="text-teal-400 mb-6 text-xl uppercase font-semibold">
-          ĐĂNG NHẬP
+          QUÊN MẬT KHẨU
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -61,48 +63,30 @@ const LoginForm = () => {
               className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
             />
           </div>
-
-          <div className="text-left">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
-              Mật khẩu
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="w-full p-3 border border-gray-300 rounded-md bg-gray-50 text-sm"
-            />
+          <div>
+            Chúng tôi sẽ gửi mã xác minh tới email này nếu nó khớp với tài khoản
+            Fvivu hiện có.
           </div>
 
           {error && <div className="text-red-500 text-sm">{error}</div>}
+          {isSuccess && (
+            <div className="text-green-500 text-sm">
+              Email đặt lại mật khẩu đã được gửi! Hãy kiểm tra hộp thư đến (hoặc
+              thư rác) của bạn.
+            </div>
+          )}
 
           <button
             className="w-full bg-teal-400 text-white py-3 rounded-full font-bold disabled:opacity-70"
             type="submit"
             disabled={isLoading}
           >
-            {isLoading ? "Đang tải..." : "ĐĂNG NHẬP"}
+            {isLoading ? "Đang tải..." : "XÁC NHẬN"}
           </button>
-
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={() => navigate("/forgot-password")}
-              className="text-sm text-teal-500 hover:underline"
-            >
-              Quên mật khẩu?
-            </button>
-          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginForm;
+export default ForgotPasswordForm;
