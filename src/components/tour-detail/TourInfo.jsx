@@ -29,12 +29,6 @@ const TourInfo = ({ tour, onSelectLocation }) => {
       alert("Vui lòng chọn ngày khởi hành.");
     } else if (!isValidDate) {
       alert("Ngày khởi hành không hợp lệ.");
-    } else {
-      console.log("Ngày:", selectedDate.format("YYYY-MM-DD"));
-      console.log("Số người:", numAdults);
-      console.log("Tổng tiền:", totalPrice);
-      alert("Bạn đã chọn ngày hợp lệ. Tiến hành đặt tour.");
-      // navigate(`/booking?tourId=${tour._id}&date=${selectedDate.format("YYYY-MM-DD")}&adults=${numAdults}`);
     }
   };
 
