@@ -1,7 +1,15 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { FaClock, FaUsers, FaMapMarkerAlt } from "react-icons/fa";
+import dayjs from "dayjs";
+import ResponsiveDatePickers from "../tour-detail/ResponsiveDatePickers";
 
 const TourInfo = ({ tour, onSelectLocation }) => {
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [numAdults, setNumAdults] = useState(2);
+  const totalPrice = numAdults * (tour?.price || 0);
+  useEffect(() => {
+    console.log("Tour data:", tour);
+  }, [tour]);
   const handleScrollToMap = (location) => {
     const mapElement = document.getElementById("tour-map");
     if (mapElement) {
@@ -9,6 +17,24 @@ const TourInfo = ({ tour, onSelectLocation }) => {
     }
     if (onSelectLocation) {
       onSelectLocation(location);
+    }
+  };
+
+  const handleBooking = () => {
+    const isValidDate = tour?.startDates?.some((date) =>
+      dayjs(date).isSame(selectedDate, "day")
+    );
+
+    if (!selectedDate) {
+      alert("Vui lòng chọn ngày khởi hành.");
+    } else if (!isValidDate) {
+      alert("Ngày khởi hành không hợp lệ.");
+    } else {
+      console.log("Ngày:", selectedDate.format("YYYY-MM-DD"));
+      console.log("Số người:", numAdults);
+      console.log("Tổng tiền:", totalPrice);
+      alert("Bạn đã chọn ngày hợp lệ. Tiến hành đặt tour.");
+      // navigate(`/booking?tourId=${tour._id}&date=${selectedDate.format("YYYY-MM-DD")}&adults=${numAdults}`);
     }
   };
 
@@ -36,7 +62,7 @@ const TourInfo = ({ tour, onSelectLocation }) => {
         </ul>
       </div>
 
-      {/* Right: Thông tin chuyến đi + Đặt ngay */}
+      {/* Right: Thông tin + chọn ngày + số lượng + giá */}
       <div className="md:col-span-1 bg-white rounded-2xl p-6 flex flex-col justify-between">
         <div>
           <h1 className="text-2xl font-semibold mb-5 text-cyan-700">
@@ -59,11 +85,78 @@ const TourInfo = ({ tour, onSelectLocation }) => {
               <span>{tour.description}</span>
             </li>
           </ul>
+
+          {/* Ngày khởi hành */}
+          <div className="max-w-md mx-auto mt-8">
+            <ResponsiveDatePickers
+              label="Chọn ngày khởi hành"
+              availableDates={tour?.startDates || []}
+              selectedDate={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+            />
+          </div>
+
+          {/* Số lượng người lớn */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between border rounded-lg p-3">
+              <div>
+                <p className="font-medium">Người lớn</p>
+                <p className="text-sm text-gray-500">&gt; 10 tuổi</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  className={`px-3 py-1 rounded ${
+                    numAdults <= 1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200"
+                  }`}
+                  onClick={() => {
+                    if (numAdults > 1) setNumAdults(numAdults - 1);
+                  }}
+                  disabled={numAdults <= 1}
+                >
+                  -
+                </button>
+                <span className="w-6 text-center">{numAdults}</span>
+                <button
+                  className={`px-3 py-1 rounded ${
+                    numAdults >= tour?.maxGroupSize
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-gray-200"
+                  }`}
+                  onClick={() => {
+                    if (numAdults < tour?.maxGroupSize)
+                      setNumAdults(numAdults + 1);
+                  }}
+                  disabled={numAdults >= tour?.maxGroupSize}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            {numAdults === tour?.maxGroupSize && (
+              <p className="text-sm text-red-500 mt-2">
+                Đã đạt số lượng tối đa: {tour.maxGroupSize} người
+              </p>
+            )}
+            {/* Tổng giá */}
+            <div className="text-center mt-4">
+              <p className="text-lg font-semibold text-orange-500">
+                Tổng Giá Tour: {totalPrice.toLocaleString()} đ
+              </p>
+            </div>
+          </div>
         </div>
 
-        <button className="mt-8 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-3 px-6 rounded-xl text-lg transition w-full">
-          Đặt ngay
-        </button>
+        {/* Nút đặt tour */}
+        <div className="text-center mt-6">
+          <button
+            onClick={handleBooking}
+            className="bg-cyan-500 hover:bg-cyan-700 text-white px-6 py-3 rounded-xl text-lg"
+          >
+            Yêu cầu đặt
+          </button>
+        </div>
       </div>
     </section>
   );

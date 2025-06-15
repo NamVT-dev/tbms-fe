@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-
 import { useParams, useNavigate } from "react-router-dom";
-
 import MapLocation from "../components/tour-detail/MapLocation";
 import TourBanner from "../components/tour-detail/TourBanner";
 import TourHeader from "../components/tour-detail/TourHeader";
@@ -14,6 +12,7 @@ const TourDetailPage = () => {
   const navigate = useNavigate();
   const [tour, setTour] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 

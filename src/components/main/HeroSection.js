@@ -1,6 +1,24 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { TourContext } from "../../contexts/TourContext";
 //import banner from "assets/banner.mp4";
 const HeroSection = () => {
+  const { searchTours } = useContext(TourContext);
+  const [location, setLocation] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [price, setPrice] = useState("");
+
+  const handleSearch = () => {
+    const [minPrice, maxPrice] = price ? price.split("-") : [null, null];
+
+    const params = {
+      search: keyword,
+      location: location !== "Tất cả địa điểm" ? location : undefined,
+      minPrice: minPrice ? Number(minPrice) * 1000 : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) * 1000 : undefined,
+    };
+
+    searchTours(params);
+  };
   return (
     <>
       <section className="relative w-full h-[950px] overflow-hidden">
@@ -51,6 +69,8 @@ const HeroSection = () => {
                   <input
                     type="text"
                     placeholder="Nhập tên địa điểm"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
                     className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400"
                   />
                 </label>
@@ -73,7 +93,11 @@ const HeroSection = () => {
                       strokeLinejoin="round"
                     ></path>
                   </svg>
-                  <select className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none">
+                  <select
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none"
+                  >
                     <option>Tất cả địa điểm</option>
                     <option>Hạ Long</option>
                     <option>Đà Nẵng</option>
@@ -115,7 +139,11 @@ const HeroSection = () => {
                       strokeLinejoin="round"
                     ></path>
                   </svg>
-                  <select className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none">
+                  <select
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none"
+                  >
                     <option>Tất cả mức giá</option>
                     <option value="0-500">Dưới 500k</option>
                     <option value="500-1000">500k - 1 triệu</option>
@@ -140,7 +168,10 @@ const HeroSection = () => {
               </div>
 
               {/* Search Button */}
-              <button className="bg-cyan-400 text-white font-medium py-3 px-6 rounded-2xl hover:bg-cyan-500 transition-colors">
+              <button
+                onClick={handleSearch}
+                className="bg-cyan-400 text-white font-medium py-3 px-6 rounded-2xl hover:bg-cyan-500 transition-colors"
+              >
                 Tìm kiếm
               </button>
             </div>

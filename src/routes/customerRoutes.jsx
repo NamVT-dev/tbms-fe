@@ -5,6 +5,7 @@ const HomePage = lazy(() => import("../pages/HomePage"));
 const LoginForm = lazy(() => import("../components/auth/LoginForm"));
 const SignUpForm = lazy(() => import("../components/auth/SignUp"));
 const TourDetailPage = lazy(() => import("../pages/TourDetailPage"));
+const BookingHistoryPage = lazy(() => import("../pages/BookingHistoryPage"));
 const ConfirmEmailForm = lazy(() =>
   import("../components/auth/ConfirmEmailForm")
 );
@@ -20,6 +21,7 @@ const customerRoutes = {
     { path: "register", element: <SignUpForm /> },
     { path: "confirmEmail", element: <ConfirmEmailForm /> },
     { path: "profile", element: <UserProfile /> },
+    { path: "booking-history", element: <BookingHistoryPage /> },
     // thêm các route khác ở đây
   ],
 };
