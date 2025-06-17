@@ -8,7 +8,6 @@ const TourInfo = ({ tour, onSelectLocation }) => {
   const [numAdults, setNumAdults] = useState(2);
   const totalPrice = numAdults * (tour?.price || 0);
   useEffect(() => {
-    console.log("Tour data:", tour);
   }, [tour]);
   const handleScrollToMap = (location) => {
     const mapElement = document.getElementById("tour-map");
