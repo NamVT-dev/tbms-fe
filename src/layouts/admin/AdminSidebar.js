@@ -27,15 +27,19 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     <aside className={`
       ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
-      transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+      transition-transform duration-300 ease-in-out
     `}>
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-        <Link to="/admin" className="flex items-center">
-          <span className="text-2xl font-semibold text-indigo-600">fvivu</span>
+        <Link to="/admin/dashboard" className="flex items-center">
+          <img
+            src="/assets/fvivu.png"
+            alt="fvivu Logo"
+            className="w-28 object-contain transition-transform duration-300"
+          />
         </Link>
         <button
-          className="p-2 rounded-md lg:hidden"
+          className="p-2 rounded-md"
           onClick={() => setSidebarOpen(false)}
         >
           <span className="sr-only">Close sidebar</span>
@@ -56,7 +60,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <nav className="mt-4 flex-1 px-2 space-y-1">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           return (
