@@ -98,10 +98,13 @@ export const userService = {
     ),
 };
 
-export function getTours() {
-  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours`);
+export function getTours(params) {
+  return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours`, {
+    params,
+  });
 }
 
 export function getTourBySlug(slug) {
+
   return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours/detail/${slug}`);
 }
