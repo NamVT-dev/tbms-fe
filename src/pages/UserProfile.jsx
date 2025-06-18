@@ -51,10 +51,10 @@ const UserProfile = () => {
       <div className="user-view">
         <nav className="user-view__menu">
           <ul className="side-nav">
-            <NavItem link="#" text="Settings" icon="settings" active={true} />
-            <NavItem link="#" text="My bookings" icon="briefcase" />
-            <NavItem link="#" text="My reviews" icon="star" />
-            <NavItem link="#" text="Billing" icon="credit-card" />
+            <NavItem link="#" text="Cài Đặt" icon="settings" active={true} />
+            <NavItem link="#" text="Tour của tôi" icon="briefcase" />
+            <NavItem link="#" text="Đánh giá" icon="star" />
+            <NavItem link="#" text="Lịch sử thanh toán" icon="credit-card" />
           </ul>
         </nav>
         <div className="user-view__content">

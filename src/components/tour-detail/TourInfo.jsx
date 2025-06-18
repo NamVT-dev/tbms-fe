@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { FaClock, FaUsers, FaMapMarkerAlt } from "react-icons/fa";
 import dayjs from "dayjs";
 import ResponsiveDatePickers from "../tour-detail/ResponsiveDatePickers";
+import { getBookingSession } from "../../services/api";
 
 const TourInfo = ({ tour, onSelectLocation }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [numAdults, setNumAdults] = useState(2);
   const totalPrice = numAdults * (tour?.price || 0);
-  useEffect(() => {
-  }, [tour]);
+  useEffect(() => {}, [tour]);
   const handleScrollToMap = (location) => {
     const mapElement = document.getElementById("tour-map");
     if (mapElement) {
@@ -19,7 +19,7 @@ const TourInfo = ({ tour, onSelectLocation }) => {
     }
   };
 
-  const handleBooking = () => {
+  const handleBooking = async () => {
     const isValidDate = tour?.startDates?.some((date) =>
       dayjs(date).isSame(selectedDate, "day")
     );
@@ -28,6 +28,12 @@ const TourInfo = ({ tour, onSelectLocation }) => {
       alert("Vui lòng chọn ngày khởi hành.");
     } else if (!isValidDate) {
       alert("Ngày khởi hành không hợp lệ.");
+    }
+    try {
+      const res = await getBookingSession(tour.id, numAdults, selectedDate);
+      window.location.href = res.data.session?.url;
+    } catch (error) {
+      window.alert("Xảy ra lỗi khi đặt tour. Hãy thử lại sau!");
     }
   };
 
