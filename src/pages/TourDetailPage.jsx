@@ -6,6 +6,7 @@ import TourHeader from "../components/tour-detail/TourHeader";
 import TourInfo from "../components/tour-detail/TourInfo";
 import { TOUR_SAMPLE } from "../data/tour";
 import { getTourBySlug } from "../services/api";
+import TourReview from "../components/tour-detail/TourReview";
 
 const TourDetailPage = () => {
   const { slug } = useParams();

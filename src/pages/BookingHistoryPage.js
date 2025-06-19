@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 const BookingHistoryPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newReviews, setNewReviews] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -23,6 +25,42 @@ const BookingHistoryPage = () => {
 
     fetchBookings();
   }, []);
+
+  const handleInputChange = (tourId, field, value) => {
+    setNewReviews((prev) => ({
+      ...prev,
+      [tourId]: {
+        ...prev[tourId],
+        [field]: value,
+      },
+    }));
+  };
+
+  const handleSubmitReview = async (tourId) => {
+    const { review, rating } = newReviews[tourId] || {};
+    if (!review || !rating)
+      return alert("Vui lòng nhập đầy đủ nội dung và đánh giá");
+
+    try {
+      setSubmitting(true);
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}reviews`,
+        { tourId, review, rating },
+        { withCredentials: true }
+      );
+
+      alert("Gửi đánh giá thành công!");
+      setNewReviews((prev) => ({
+        ...prev,
+        [tourId]: { review: "", rating: "" },
+      }));
+    } catch (err) {
+      console.error("Lỗi khi gửi đánh giá:", err);
+      alert("Đã xảy ra lỗi khi gửi đánh giá");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return <p className="text-center mt-10">Đang tải dữ liệu đặt tour...</p>;
@@ -97,12 +135,50 @@ const BookingHistoryPage = () => {
                 </p>
               )}
 
-              {/* Nếu muốn hiển thị người dùng (admin xem được) */}
               {booking.user?.name && (
                 <p className="text-sm text-gray-500 mt-2">
                   <strong>Người đặt:</strong> {booking.user.name}
                 </p>
               )}
+
+              {/* Đánh giá */}
+              <div className="mt-4 space-y-2">
+                <textarea
+                  className="w-full border rounded p-2 text-sm"
+                  rows={3}
+                  placeholder="Nhập nhận xét của bạn..."
+                  value={newReviews[booking.tour._id]?.review || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      booking.tour._id,
+                      "review",
+                      e.target.value
+                    )
+                  }
+                />
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  className="w-24 border rounded p-2 text-sm"
+                  placeholder="Điểm (1-5)"
+                  value={newReviews[booking.tour._id]?.rating || ""}
+                  onChange={(e) =>
+                    handleInputChange(
+                      booking.tour._id,
+                      "rating",
+                      e.target.value
+                    )
+                  }
+                />
+                <button
+                  disabled={submitting}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded text-sm"
+                  onClick={() => handleSubmitReview(booking.tour._id)}
+                >
+                  {submitting ? "Đang gửi..." : "Gửi đánh giá"}
+                </button>
+              </div>
             </div>
           </div>
         ))}
