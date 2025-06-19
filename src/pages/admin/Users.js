@@ -51,7 +51,7 @@ export default function Users() {
       }
 
       const res = await axios.get(
-        `http://localhost:9999/admin/users?${params.toString()}`,
+        `${process.env.REACT_APP_BACKEND_URL}admin/users?${params.toString()}`,
         {
           withCredentials: true,
         }
@@ -102,7 +102,7 @@ export default function Users() {
     setCreateLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:9999/admin/createPartner",
+        `${process.env.REACT_APP_BACKEND_URL}admin/createPartner`,
         partnerForm,
         {
           withCredentials: true,
@@ -123,6 +123,30 @@ export default function Users() {
       );
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  const handleBanUser = async (userId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn cấm người dùng này?")) {
+      return;
+    }
+
+    try {
+      const response = await axios.patch(
+        `${process.env.REACT_APP_BACKEND_URL}admin/users/${userId}/ban`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data && response.data.status === "success") {
+        alert("Đã cấm người dùng thành công!");
+        getUsers(); // Refresh danh sách users
+      }
+    } catch (err) {
+      console.error("Lỗi khi cấm người dùng:", err);
+      alert(err.response?.data?.message || "Có lỗi xảy ra khi cấm người dùng");
     }
   };
 
@@ -182,34 +206,6 @@ export default function Users() {
             </div>
           </div>
         </div>
-
-        {/* <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="bg-green-50 rounded-lg p-3">
-              <UserIcon className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Đang hoạt động</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {users.filter(u => u.active === true).length}
-              </p>
-            </div>
-          </div>
-        </div> */}
-
-        {/* <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="bg-red-50 rounded-lg p-3">
-              <NoSymbolIcon className="w-6 h-6 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Bị chặn</p>
-              <p className="text-2xl font-semibold text-gray-900">
-              {total - users.filter(u => u.active === true).length}
-              </p>
-            </div>
-          </div>
-        </div> */}
       </div>
 
       {/* Search and Filters */}
@@ -251,21 +247,6 @@ export default function Users() {
               </select>
             </div>
             <div className="relative">
-              {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FunnelIcon className="h-5 w-5 text-gray-400" />
-              </div> */}
-              {/* <select
-                value={status}
-                onChange={(e) => {
-                  setPage(1);
-                  setStatus(e.target.value);
-                }}
-                className="pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Tất cả trạng thái</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select> */}
             </div>
           </div>
         </div>
@@ -329,9 +310,7 @@ export default function Users() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       className="text-red-600 hover:text-red-900"
-                      onClick={() => {
-                        /* Thêm xử lý chặn */
-                      }}
+                      onClick={() => handleBanUser(user._id)}
                     >
                       <NoSymbolIcon className="h-5 w-5" />
                     </button>

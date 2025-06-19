@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   HomeIcon,
   UserGroupIcon,
@@ -8,34 +8,45 @@ import {
   ChatBubbleLeftIcon,
   ChartBarIcon,
   Cog6ToothIcon,
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: HomeIcon },
-  { name: 'Manage Users', href: '/admin/users', icon: UserGroupIcon },
-  { name: 'Pending Tours', href: '/admin/pending-tours', icon: ClockIcon },
-  { name: 'Calendar', href: '/admin/calendar', icon: CalendarIcon },
-  { name: 'Chat', href: '/admin/chat', icon: ChatBubbleLeftIcon },
-  { name: 'Statistics', href: '/admin/statistics', icon: ChartBarIcon },
-  { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
+  { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
+  {
+    name: "Partner Dashboard",
+    href: "/admin/partner-dashboard",
+    icon: HomeIcon,
+  },
+  { name: "Manage Users", href: "/admin/users", icon: UserGroupIcon },
+  { name: "Pending Tours", href: "/admin/pending-tours", icon: ClockIcon },
+  { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon },
+  { name: "Chat", href: "/admin/chat", icon: ChatBubbleLeftIcon },
+  { name: "Statistics", href: "/admin/statistics", icon: ChartBarIcon },
+  { name: "Settings", href: "/admin/settings", icon: Cog6ToothIcon },
 ];
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
 
   return (
-    <aside className={`
-      ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+    <aside
+      className={`
+      ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
-      transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+      transition-transform duration-300 ease-in-out
     `}>
+
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-        <Link to="/admin" className="flex items-center">
-          <span className="text-2xl font-semibold text-indigo-600">fvivu</span>
+        <Link to="/admin/dashboard" className="flex items-center">
+          <img
+            src="/assets/fvivu.png"
+            alt="fvivu Logo"
+            className="w-28 object-contain transition-transform duration-300"
+          />
         </Link>
         <button
-          className="p-2 rounded-md lg:hidden"
+          className="p-2 rounded-md"
           onClick={() => setSidebarOpen(false)}
         >
           <span className="sr-only">Close sidebar</span>
@@ -56,7 +67,7 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+      <nav className="mt-4 flex-1 px-2 space-y-1">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -65,16 +76,17 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
               to={item.href}
               className={`
                 flex items-center px-4 py-2 text-sm font-medium rounded-lg
-                ${isActive
-                  ? 'bg-indigo-50 text-indigo-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                ${
+                  isActive
+                    ? "bg-indigo-50 text-indigo-600"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }
               `}
             >
               <item.icon
                 className={`
                   w-5 h-5 mr-3
-                  ${isActive ? 'text-indigo-600' : 'text-gray-400'}
+                  ${isActive ? "text-indigo-600" : "text-gray-400"}
                 `}
               />
               {item.name}
@@ -86,4 +98,4 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   );
 };
 
-export default AdminSidebar; 
+export default AdminSidebar;

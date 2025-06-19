@@ -107,3 +107,17 @@ export function getTours(params) {
 export function getTourBySlug(slug) {
   return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours/detail/${slug}`);
 }
+
+export function getBookingSession(tourId, numberOfPeople, startDate) {
+  return axios.post(
+    `${process.env.REACT_APP_BACKEND_URL}bookings/checkout-session`,
+    {
+      tourId,
+      numberOfPeople,
+      startDate,
+    },
+    {
+      withCredentials: true,
+    }
+  );
+}

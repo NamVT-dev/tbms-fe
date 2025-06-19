@@ -31,7 +31,7 @@ export default function PendingTours() {
   const getAllTours = useCallback(async () => {
     try {
       const res = await axios.get(
-        `http://localhost:9999/admin/pendingTour?limit=1000`,
+        `${process.env.REACT_APP_BACKEND_URL}admin/pendingTour?limit=1000`,
         {
           withCredentials: true,
         }
@@ -66,7 +66,7 @@ export default function PendingTours() {
       }
 
       const res = await axios.get(
-        `http://localhost:9999/admin/pendingTour?${params.toString()}`,
+        `${process.env.REACT_APP_BACKEND_URL}admin/pendingTour?${params.toString()}`,
         {
           withCredentials: true,
         }
@@ -135,7 +135,7 @@ export default function PendingTours() {
     setProcessing(true);
     try {
       await axios.patch(
-        `http://localhost:9999/admin/pendingTour/${selectedTour._id}/approve`,
+        `${process.env.REACT_APP_BACKEND_URL}admin/pendingTour/${selectedTour._id}/approve`,
         { decision: decision === "approve" ? "active" : "inactive" },
         {
           withCredentials: true,
@@ -272,7 +272,7 @@ export default function PendingTours() {
                 Partner
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Giá & Đánh giá
+                Giá
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Hành động
@@ -305,7 +305,6 @@ export default function PendingTours() {
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">
                       <div>Thời gian: {tour.duration} ngày</div>
-                      <div>Độ khó: {tour.difficulty}</div>
                       <div>Số lượng: {tour.maxGroupSize} người</div>
                       <div>Địa điểm: {tour.startLocation.address}</div>
                     </div>
