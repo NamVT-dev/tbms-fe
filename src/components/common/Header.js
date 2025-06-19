@@ -9,6 +9,12 @@ const Header = () => {
   const menuRef = useRef(null);
 
   useEffect(() => {
+    if (user && !user.active) {
+      navigate("/confirm-email");
+    }
+  }, [navigate, user]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
@@ -44,18 +50,18 @@ const Header = () => {
           {/* Navigation Menu */}
           <nav className="hidden md:flex gap-6 h-full items-center">
             {[
-              "Tìm du thuyền",
-              "Tìm vé máy bay",
-              "Tìm khách sạn",
-              "Doanh nghiệp",
-              "Blog",
+              { label: "Tìm du thuyền", href: "/" },
+              { label: "Tìm vé máy bay", href: "/" },
+              { label: "Tìm khách sạn", href: "/" },
+              { label: "Blog", href: "/" },
+              { label: "Lịch sử", href: "/booking-history" },
             ].map((item, index) => (
               <a
                 key={index}
-                href="/"
+                href={item.href}
                 className="text-lg font-medium hover:text-blue-600 transition-colors h-full flex items-center"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
