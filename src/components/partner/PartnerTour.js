@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "../../layouts/partner/Sidebar";
+import Header from "../../layouts/partner/Header";
 
 const PartnerTour = () => {
     const [tours, setTours] = useState([]);
@@ -14,9 +16,7 @@ const PartnerTour = () => {
                     "http://localhost:9999/api/tours/partner",
                     {
                         method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
+                        headers: { "Content-Type": "application/json" },
                         credentials: "include",
                     }
                 );
@@ -52,15 +52,12 @@ const PartnerTour = () => {
                 `http://localhost:9999/tours/${tourId}`,
                 {
                     method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     credentials: "include",
                 }
             );
 
             const data = await response.json();
-
             if (response.ok) {
                 alert("Xóa tour thành công!");
                 setTours(tours.filter((tour) => tour._id !== tourId));
@@ -72,136 +69,162 @@ const PartnerTour = () => {
         }
     };
 
+    const formatPrice = (value) =>
+        value?.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+
     return (
-        <div className="max-w-7xl mx-auto p-4">
-            <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">
-                Danh Sách Tour Của Bạn
-            </h2>
-
-            <div className="flex justify-between items-center mb-4 gap-4 flex-wrap">
-                <input
-                    type="text"
-                    placeholder="🔎 Tìm kiếm theo tên..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <button
-                    onClick={() =>
-                        setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                    }
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                >
-                    {sortOrder === "asc"
-                        ? "⬆️ Giá tăng dần"
-                        : "⬇️ Giá giảm dần"}
-                </button>
-                <button
-                    onClick={() => navigate("/partner/dashboard")}
-                    className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
-                >
-                    🔙 Về Dashboard
-                </button>
+        <div className="flex bg-gray-100 min-h-screen">
+            <div className="w-64 bg-gray-900 text-white">
+                <Sidebar />
             </div>
+            <div className="flex-1">
+                <Header />
+                <div className="p-8">
+                    <h2 className="text-3xl font-bold text-blue-800 mb-6">
+                        📋 Danh Sách Tour Của Bạn
+                    </h2>
 
-            <div className="overflow-auto rounded shadow">
-                <table className="w-full text-sm text-center border-collapse bg-white">
-                    <thead className="bg-blue-800 text-white text-xs uppercase">
-                        <tr>
-                            <th className="px-3 py-2">#</th>
-                            <th className="px-3 py-2">Tên Tour</th>
-                            <th className="px-3 py-2">Thời Gian</th>
-                            <th className="px-3 py-2">Nhóm</th>
-                            <th className="px-3 py-2">Giá Gốc</th>
-                            <th className="px-3 py-2">Giá Giảm</th>
-                            <th className="px-3 py-2">Điểm Bắt Đầu</th>
-                            <th className="px-3 py-2">Ảnh</th>
-                            <th className="px-3 py-2">Trạng Thái</th>
-                            <th className="px-3 py-2">Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredTours.map((tour, index) => (
-                            <tr
-                                key={tour._id}
-                                className="border-b hover:bg-gray-50"
-                            >
-                                <td className="px-2 py-2">{index + 1}</td>
-                                <td className="font-semibold text-blue-700">
-                                    {tour.name}
-                                </td>
-                                <td>{tour.duration} ngày</td>
-                                <td>{tour.maxGroupSize} người</td>
-                                <td className="text-green-600 font-medium">
-                                    {tour.price} VND
-                                </td>
-                                <td className="text-red-600">
-                                    {tour.priceDiscount
-                                        ? `${tour.priceDiscount} VND`
-                                        : "Không"}
-                                </td>
-                                <td>
-                                    {tour.startLocation?.address || "Không có"}
-                                </td>
-                                <td>
-                                    {tour.imageCover ? (
-                                        <img
-                                            src={tour.imageCover}
-                                            alt="Ảnh Tour"
-                                            className="w-20 h-12 object-cover rounded"
-                                        />
-                                    ) : (
-                                        "Không ảnh"
-                                    )}
-                                </td>
-                                <td>
-                                    <span
-                                        className={`px-2 py-1 rounded text-white text-xs ${
-                                            tour.status === "active"
-                                                ? "bg-green-600"
-                                                : tour.status === "pending"
-                                                ? "bg-yellow-500"
-                                                : "bg-gray-500"
-                                        }`}
+                    <div className="flex flex-wrap gap-4 mb-6 items-center">
+                        <input
+                            type="text"
+                            placeholder="🔎 Tìm kiếm theo tên..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-400 shadow-sm"
+                        />
+                        <button
+                            onClick={() =>
+                                setSortOrder(
+                                    sortOrder === "asc" ? "desc" : "asc"
+                                )
+                            }
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                        >
+                            {sortOrder === "asc"
+                                ? "⬆️ Giá tăng dần"
+                                : "⬇️ Giá giảm dần"}
+                        </button>
+                        <button
+                            onClick={() => navigate("/partner/dashboard")}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                        >
+                            🔙 Về Dashboard
+                        </button>
+                    </div>
+
+                    <div className="overflow-auto rounded-xl shadow bg-white">
+                        <table className="w-full text-sm text-center">
+                            <thead className="bg-indigo-600 text-white">
+                                <tr>
+                                    <th className="px-3 py-2">STT</th>
+                                    <th className="px-3 py-2">Tên Tour</th>
+                                    <th className="px-3 py-2">Thời Gian</th>
+                                    <th className="px-3 py-2">Nhóm</th>
+                                    <th className="px-3 py-2">Giá Gốc</th>
+                                    <th className="px-3 py-2">Giảm Giá (%)</th>
+                                    <th className="px-3 py-2">Giá Sau Giảm</th>
+                                    <th className="px-3 py-2">Điểm Bắt Đầu</th>
+                                    <th className="px-3 py-2">Ảnh</th>
+                                    <th className="px-3 py-2">Trạng Thái</th>
+                                    <th className="px-3 py-2">Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredTours.map((tour, index) => (
+                                    <tr
+                                        key={tour._id}
+                                        className="border-b hover:bg-gray-50"
                                     >
-                                        {tour.status === "active"
-                                            ? "Hoạt động"
-                                            : tour.status === "pending"
-                                            ? "Chờ duyệt"
-                                            : "Không hoạt động"}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="flex gap-2 justify-center">
-                                        <button
-                                            onClick={() =>
-                                                navigate(
-                                                    `/partner/tours/edit/${tour._id}`
-                                                )
-                                            }
-                                            className="px-3 py-1 text-sm bg-yellow-400 hover:bg-yellow-500 rounded text-white"
+                                        <td className="px-2 py-2">
+                                            {index + 1}
+                                        </td>
+                                        <td className="font-semibold text-blue-800">
+                                            {tour.name}
+                                        </td>
+                                        <td>{tour.duration} ngày</td>
+                                        <td>{tour.maxGroupSize} người</td>
+                                        <td className="text-green-700 font-medium">
+                                            {formatPrice(tour.price)}
+                                        </td>
+                                        <td className="text-red-600">
+                                            {tour.priceDiscount
+                                                ? `${tour.priceDiscount}%`
+                                                : "0%"}
+                                        </td>
+                                        <td className="text-indigo-700 font-semibold">
+                                            {formatPrice(tour.finalPrice)}
+                                        </td>
+                                        <td>
+                                            {tour.startLocation?.address ||
+                                                "Không có"}
+                                        </td>
+                                        <td>
+                                            {tour.imageCover ? (
+                                                <img
+                                                    src={tour.imageCover}
+                                                    alt="Ảnh Tour"
+                                                    className="w-20 h-12 object-cover rounded"
+                                                />
+                                            ) : (
+                                                "Không ảnh"
+                                            )}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`px-2 py-1 rounded text-white text-xs font-medium ${
+                                                    tour.status === "active"
+                                                        ? "bg-green-600"
+                                                        : tour.status ===
+                                                          "pending"
+                                                        ? "bg-yellow-500"
+                                                        : "bg-gray-500"
+                                                }`}
+                                            >
+                                                {tour.status === "active"
+                                                    ? "Hoạt động"
+                                                    : tour.status === "pending"
+                                                    ? "Chờ duyệt"
+                                                    : "Không hoạt động"}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className="flex gap-2 justify-center">
+                                                <button
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/partner/tours/edit/${tour._id}`
+                                                        )
+                                                    }
+                                                    className="px-3 py-1 text-sm bg-yellow-500 hover:bg-yellow-600 rounded text-white"
+                                                >
+                                                    Sửa
+                                                </button>
+                                                <button
+                                                    onClick={() =>
+                                                        deleteTour(tour._id)
+                                                    }
+                                                    className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded text-white"
+                                                >
+                                                    Xóa
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filteredTours.length === 0 && (
+                                    <tr>
+                                        <td
+                                            colSpan="11"
+                                            className="py-6 text-gray-500"
                                         >
-                                            Sửa
-                                        </button>
-                                        <button
-                                            onClick={() => deleteTour(tour._id)}
-                                            className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded text-white"
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                        {filteredTours.length === 0 && (
-                            <tr>
-                                <td colSpan="10" className="py-6 text-gray-500">
-                                    Không tìm thấy tour nào.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                            Không tìm thấy tour nào.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     );

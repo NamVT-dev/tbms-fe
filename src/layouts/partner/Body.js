@@ -37,43 +37,56 @@ const Body = () => {
     ).length;
 
     return (
-        <div className="max-w-7xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg">
-            <h2 className="text-4xl font-bold text-center text-blue-600">
-                📌 Quản Lý Tour Du Lịch
+        <div className="max-w-7xl mx-auto px-6 py-8">
+            <h2 className="text-4xl font-bold text-center text-primary mb-10">
+                <span role="img" aria-label="pin">
+                    📌
+                </span>{" "}
+                <span className="text-gray-800">Quản Lý Tour Du Lịch</span>
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                {/* Tổng số tour */}
-                <div className="p-6 bg-gradient-to-r from-gray-200 to-gray-100 rounded-xl shadow-lg text-center">
-                    <h5 className="text-blue-700 font-semibold text-lg uppercase">
+
+            {/* Tổng quan tour */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow h-full text-center">
+                    <h5 className="text-sm font-medium text-gray-500 uppercase">
                         Tổng số tour
                     </h5>
-                    <h3 className="text-4xl font-bold text-gray-800">
+                    <h3 className="text-3xl font-bold text-indigo-600 mt-2">
                         {tours.length} tour
                     </h3>
                 </div>
 
-                {/* Tour đang hoạt động */}
-                <div className="p-6 bg-gradient-to-r from-green-400 to-green-500 text-white rounded-xl shadow-lg text-center">
-                    <h5 className="text-lg uppercase">Tour đang hoạt động</h5>
-                    <h3 className="text-4xl font-bold">{activeTours} tour</h3>
+                <div className="rounded-xl border border-green-200 bg-green-50 p-6 shadow h-full text-center">
+                    <h5 className="text-sm font-medium text-green-700 uppercase">
+                        Tour đang hoạt động
+                    </h5>
+                    <h3 className="text-3xl font-bold text-green-700 mt-2">
+                        {activeTours} tour
+                    </h3>
                 </div>
 
-                {/* Tour đang chờ duyệt */}
-                <div className="p-6 bg-gradient-to-r from-yellow-300 to-yellow-400 text-gray-800 rounded-xl shadow-lg text-center">
-                    <h5 className="text-lg uppercase">Tour đang chờ duyệt</h5>
-                    <h3 className="text-4xl font-bold">{pendingTours} tour</h3>
+                <div className="rounded-xl border border-yellow-300 bg-yellow-50 p-6 shadow h-full text-center">
+                    <h5 className="text-sm font-medium text-yellow-700 uppercase">
+                        Tour đang chờ duyệt
+                    </h5>
+                    <h3 className="text-3xl font-bold text-yellow-700 mt-2">
+                        {pendingTours} tour
+                    </h3>
                 </div>
             </div>
 
             {/* Tour nổi bật */}
-            <h3 className="text-3xl font-bold text-center mt-10 text-gray-700">
-                🏆 Tour Nổi Bật
+            <h3 className="text-2xl font-semibold text-gray-800 mt-12 mb-6 text-center">
+                <span role="img" aria-label="trophy">
+                    🏆
+                </span>{" "}
+                Tour Nổi Bật
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {tours.slice(0, 3).map((tour) => (
                     <div
                         key={tour._id}
-                        className="bg-white shadow-lg rounded-lg overflow-hidden hover:scale-105 transition-transform"
+                        className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md transition overflow-hidden flex flex-col"
                     >
                         <img
                             src={
@@ -81,27 +94,28 @@ const Body = () => {
                                 "https://via.placeholder.com/400"
                             }
                             alt="Ảnh Tour"
-                            className="w-full h-56 object-cover"
+                            className="w-full h-52 object-cover"
                         />
-                        <div className="p-6">
-                            <h4 className="font-bold text-xl text-blue-700">
+                        <div className="p-5 flex flex-col flex-grow">
+                            <h4 className="font-semibold text-base text-indigo-700">
                                 {tour.name}
                             </h4>
-                            <p className="text-gray-600">
-                                ⏳ {tour.duration} ngày • 💰 {tour.price} VND
+                            <p className="text-sm text-gray-600 mt-1">
+                                ⏳ {tour.duration} ngày • 💰{" "}
+                                {tour.price.toLocaleString()} VND
                             </p>
-                            <p className="text-gray-500">
+                            <p className="text-sm text-gray-500 mt-1">
                                 📍{" "}
                                 {tour.startLocation?.address ||
                                     "Không có thông tin"}
                             </p>
                             <span
-                                className={`inline-block px-3 py-1 rounded-full text-white text-sm mt-3 ${
+                                className={`mt-3 inline-block w-fit px-3 py-1 text-xs font-medium rounded-full ${
                                     tour.status === "active"
-                                        ? "bg-green-500"
+                                        ? "bg-green-100 text-green-700"
                                         : tour.status === "pending"
-                                        ? "bg-yellow-400"
-                                        : "bg-gray-500"
+                                        ? "bg-yellow-100 text-yellow-700"
+                                        : "bg-gray-100 text-gray-600"
                                 }`}
                             >
                                 {tour.status === "active"
@@ -110,11 +124,12 @@ const Body = () => {
                                     ? "Chờ duyệt"
                                     : "Không hoạt động"}
                             </span>
+
                             <button
                                 onClick={() =>
                                     navigate(`/partner/tours/edit/${tour._id}`)
                                 }
-                                className="mt-5 w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+                                className="mt-5 w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
                             >
                                 ✏️ Chỉnh Sửa
                             </button>

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Sidebar from "../../layouts/partner/Sidebar";
+import Header from "../../layouts/partner/Header";
 
 const BookingList = () => {
     const [bookings, setBookings] = useState([]);
@@ -34,108 +36,124 @@ const BookingList = () => {
     );
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
-            <h2 className="text-2xl font-bold text-center mb-6">
-                🗕️ Đơn Đặt Tour
-            </h2>
-
-            <div className="flex justify-center space-x-2 mb-6">
-                {[
-                    { label: "Tất cả", value: "all" },
-                    { label: "Chờ duyệt", value: "pending" },
-                    { label: "Đã xác nhận", value: "confirmed" },
-                    { label: "Đã hủy", value: "cancelled" },
-                ].map(({ label, value }) => (
-                    <button
-                        key={value}
-                        className={`px-4 py-2 border rounded-md ${
-                            filterStatus === value
-                                ? value === "pending"
-                                    ? "bg-yellow-500 text-white"
-                                    : value === "confirmed"
-                                    ? "bg-green-500 text-white"
-                                    : value === "cancelled"
-                                    ? "bg-red-500 text-white"
-                                    : "bg-gray-800 text-white"
-                                : "bg-gray-200"
-                        }`}
-                        onClick={() => setFilterStatus(value)}
-                    >
-                        {label}
-                    </button>
-                ))}
+        <div className="flex bg-gray-100 min-h-screen">
+            <div className="w-64 bg-gray-900 text-white">
+                <Sidebar />
             </div>
 
-            {/* Bảng danh sách booking */}
-            <div className="overflow-x-auto">
-                <table className="w-full table-auto border-collapse border border-gray-300">
-                    <thead className="bg-gray-800 text-white">
-                        <tr>
-                            <th className="border border-gray-300 px-4 py-2">
-                                #
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Khách hàng
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Email
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Tên Tour
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Giá
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Ngày đặt
-                            </th>
-                            <th className="border border-gray-300 px-4 py-2">
-                                Trạng thái
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredBookings.map((booking, index) => (
-                            <tr key={index} className="text-center">
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {index + 1}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {booking.customer?.name || "-"}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {booking.customer?.email || "-"}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {booking.tour?.name || "-"}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2 text-green-500">
-                                    {booking.price?.toLocaleString() || 0} VND
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                    {booking.bookedAt
-                                        ? new Date(
-                                              booking.bookedAt
-                                          ).toLocaleDateString()
-                                        : "-"}
-                                </td>
-                                <td className="border border-gray-300 px-4 py-2">
-                                    <span
-                                        className={`px-2 py-1 rounded-md text-white ${
-                                            booking.status === "confirmed"
-                                                ? "bg-green-500"
-                                                : booking.status === "pending"
-                                                ? "bg-yellow-500"
-                                                : "bg-red-500"
-                                        }`}
-                                    >
-                                        {booking.status}
-                                    </span>
-                                </td>
-                            </tr>
+            <div className="flex-1">
+                <Header />
+                <div className="p-8">
+                    <h2 className="text-3xl font-bold text-center text-indigo-700 mb-6">
+                        Danh Sách Đơn Đặt Tour
+                    </h2>
+
+                    <div className="flex justify-center flex-wrap gap-2 mb-6">
+                        {[
+                            { label: "Tất cả", value: "all" },
+                            { label: "Chờ duyệt", value: "pending" },
+                            { label: "Đã xác nhận", value: "confirmed" },
+                            { label: "Đã hủy", value: "cancelled" },
+                        ].map(({ label, value }) => (
+                            <button
+                                key={value}
+                                className={`px-4 py-2 rounded-lg font-medium transition shadow-sm ${
+                                    filterStatus === value
+                                        ? value === "pending"
+                                            ? "bg-yellow-500 text-white"
+                                            : value === "confirmed"
+                                            ? "bg-green-600 text-white"
+                                            : value === "cancelled"
+                                            ? "bg-red-600 text-white"
+                                            : "bg-gray-800 text-white"
+                                        : "bg-gray-200 text-gray-800"
+                                }`}
+                                onClick={() => setFilterStatus(value)}
+                            >
+                                {label}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+
+                    <div className="overflow-auto rounded-xl shadow bg-white">
+                        <table className="w-full text-sm text-center">
+                            <thead className="bg-indigo-600 text-white">
+                                <tr>
+                                    <th className="px-3 py-2">STT</th>
+                                    <th className="px-3 py-2">Khách hàng</th>
+                                    <th className="px-3 py-2">Email</th>
+                                    <th className="px-3 py-2">Tên Tour</th>
+                                    <th className="px-3 py-2">Giá</th>
+                                    <th className="px-3 py-2">Ngày đặt</th>
+                                    <th className="px-3 py-2">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredBookings.map((booking, index) => (
+                                    <tr
+                                        key={index}
+                                        className="border-b hover:bg-gray-50"
+                                    >
+                                        <td className="px-3 py-2">
+                                            {index + 1}
+                                        </td>
+                                        <td>{booking.customer?.name || "-"}</td>
+                                        <td>
+                                            {booking.customer?.email || "-"}
+                                        </td>
+                                        <td>{booking.tour?.name || "-"}</td>
+                                        <td className="text-green-700 font-medium">
+                                            {booking.price?.toLocaleString(
+                                                "vi-VN",
+                                                {
+                                                    style: "currency",
+                                                    currency: "VND",
+                                                }
+                                            ) || "0 VND"}
+                                        </td>
+                                        <td>
+                                            {booking.bookedAt
+                                                ? new Date(
+                                                      booking.bookedAt
+                                                  ).toLocaleDateString()
+                                                : "-"}
+                                        </td>
+                                        <td>
+                                            <span
+                                                className={`px-2 py-1 rounded-md text-white text-xs font-medium ${
+                                                    booking.status ===
+                                                    "confirmed"
+                                                        ? "bg-green-600"
+                                                        : booking.status ===
+                                                          "pending"
+                                                        ? "bg-yellow-500"
+                                                        : "bg-red-600"
+                                                }`}
+                                            >
+                                                {booking.status === "confirmed"
+                                                    ? "Đã xác nhận"
+                                                    : booking.status ===
+                                                      "pending"
+                                                    ? "Chờ duyệt"
+                                                    : "Đã hủy"}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filteredBookings.length === 0 && (
+                                    <tr>
+                                        <td
+                                            colSpan="7"
+                                            className="py-6 text-gray-500"
+                                        >
+                                            Không có đơn đặt tour nào.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     );
