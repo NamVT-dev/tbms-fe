@@ -7,7 +7,6 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchUser() {
@@ -62,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.logout();
             setUser(null);
-            navigate("/");
+            window.location.href = "/";
             return true;
         } catch (err) {
             throw new Error("Không thể đăng xuất");

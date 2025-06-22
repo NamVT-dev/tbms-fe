@@ -1,6 +1,6 @@
 import { lazy } from "react";
+const CustomerLayout = lazy(() => import("../layouts/customer/CustomerLayout"));
 
-const MainLayout = lazy(() => import("../layouts/partner/MainLayout"));
 const HomePage = lazy(() => import("../pages/HomePage"));
 const LoginForm = lazy(() => import("../components/auth/LoginForm"));
 const SignUpForm = lazy(() => import("../components/auth/SignUp"));
@@ -19,7 +19,7 @@ const UserProfile = lazy(() => import("../pages/UserProfile"));
 
 const customerRoutes = {
     path: "/",
-    element: <MainLayout />,
+    element: <CustomerLayout />,
     children: [
         { index: true, element: <HomePage /> },
         { path: "tour-detail/:slug", element: <TourDetailPage /> },
