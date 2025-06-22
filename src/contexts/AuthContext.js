@@ -1,6 +1,6 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authService } from "../services/api";
+import { authService, userService } from "../services/api";
 import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
@@ -8,18 +8,19 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+
     useEffect(() => {
-        // Check if user is already logged in
-        const storedUser = localStorage.getItem("user");
-        if (storedUser && storedUser !== "undefined") {
+        async function fetchUser() {
             try {
-                setUser(JSON.parse(storedUser));
-            } catch (error) {
-                console.error("Invalid user data in localStorage", error);
-                localStorage.removeItem("user");
-            }
+                const res = await userService.getMe();
+                const user = res.data.data.data;
+                if (user) {
+                    setUser(user);
+                }
+                setLoading(false);
+            } catch (error) {}
         }
-        setLoading(false);
+        fetchUser();
     }, []);
 
     const login = async (email, password) => {
@@ -27,10 +28,6 @@ export const AuthProvider = ({ children }) => {
             const res = await authService.login(email, password);
             if (res.data.status === "success") {
                 setUser(res.data.data.user);
-                localStorage.setItem(
-                    "user",
-                    JSON.stringify(res.data.data.user)
-                );
                 return res.data.data.user;
             }
         } catch (err) {
@@ -65,7 +62,6 @@ export const AuthProvider = ({ children }) => {
         try {
             await authService.logout();
             setUser(null);
-            localStorage.removeItem("user");
             navigate("/");
             return true;
         } catch (err) {
@@ -73,6 +69,33 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const forgotPassword = async (email) => {
+        try {
+            const res = await authService.forgotPassword(email);
+            if (res.data.status === "success") return true;
+        } catch (err) {
+            throw new Error(
+                err.response?.data?.message ||
+                    "Có vấn đề xảy ra trong quá trình xác nhận!"
+            );
+        }
+    };
+
+    const resetPassword = async (email, token, password, passwordConfirm) => {
+        try {
+            const res = await authService.resetPassword(
+                email,
+                token,
+                password,
+                passwordConfirm
+            );
+            if (res.data.status === "success") return true;
+        } catch (err) {
+            throw new Error(
+                err.response?.data?.message || "Không thể đặt lại mật khẩu"
+            );
+        }
+    };
     return (
         <AuthContext.Provider
             value={{
@@ -81,6 +104,8 @@ export const AuthProvider = ({ children }) => {
                 login,
                 signup,
                 logout,
+                forgotPassword,
+                resetPassword,
                 isAuthenticated: !!user,
             }}
         >

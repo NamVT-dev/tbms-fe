@@ -21,7 +21,7 @@ axios.interceptors.response.use(
 export const authService = {
     login: (email, password) =>
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`,
+            `${process.env.REACT_APP_BACKEND_URL}auth/login`,
             {
                 email,
                 password,
@@ -30,9 +30,10 @@ export const authService = {
                 withCredentials: true,
             }
         ),
+
     signup: (name, email, password, passwordConfirm) =>
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`,
+            `${process.env.REACT_APP_BACKEND_URL}auth/signup`,
             {
                 name,
                 email,
@@ -43,8 +44,44 @@ export const authService = {
                 withCredentials: true,
             }
         ),
+
     logout: () =>
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/logout`),
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}auth/logout`, {
+            withCredentials: true,
+        }),
+
+    confirmEmail: (pin) =>
+        axios.get(
+            `${process.env.REACT_APP_BACKEND_URL}auth/confirmEmail/${pin}`,
+            {
+                withCredentials: true,
+            }
+        ),
+
+    resendConfirmEmail: () =>
+        axios.get(
+            `${process.env.REACT_APP_BACKEND_URL}auth/resendConfirmEmail`,
+            {
+                withCredentials: true,
+            }
+        ),
+
+    forgotPassword: (email) =>
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}auth/forgotPassword`, {
+            email,
+        }),
+
+    resetPassword: (email, token, password, passwordConfirm) =>
+        axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}auth/resetPassword`,
+            {
+                email,
+                token,
+                password,
+                passwordConfirm,
+            },
+            { withCredentials: true }
+        ),
 };
 
 export const userService = {
@@ -76,10 +113,28 @@ export const userService = {
     },
 };
 
-export function getTours() {
-    return axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/tours`);
+export function getTours(params) {
+    return axios.get(`${process.env.REACT_APP_BACKEND_URL}tours`, {
+        params,
+    });
 }
 
 export function getTourBySlug(slug) {
-    return axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/tours/${slug}`);
+    return axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}tours/detail/${slug}`
+    );
+}
+
+export function getBookingSession(tourId, numberOfPeople, startDate) {
+    return axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}bookings/checkout-session`,
+        {
+            tourId,
+            numberOfPeople,
+            startDate,
+        },
+        {
+            withCredentials: true,
+        }
+    );
 }

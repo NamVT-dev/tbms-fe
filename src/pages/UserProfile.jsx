@@ -102,13 +102,21 @@ const UserProfile = () => {
                     <ul className="side-nav">
                         <NavItem
                             link="#"
-                            text="Settings"
+                            text="Cài Đặt"
                             icon="settings"
                             active={true}
                         />
-                        <NavItem link="#" text="My bookings" icon="briefcase" />
-                        <NavItem link="#" text="My reviews" icon="star" />
-                        <NavItem link="#" text="Billing" icon="credit-card" />
+                        <NavItem
+                            link="#"
+                            text="Tour Của Tôi"
+                            icon="briefcase"
+                        />
+                        <NavItem link="#" text="Đánh Giá" icon="star" />
+                        <NavItem
+                            link="#"
+                            text="Lịch Sử Thanh Toán"
+                            icon="credit-card"
+                        />
                     </ul>
                 </nav>
                 <div className="user-view__content">
@@ -128,10 +136,14 @@ const UserProfile = () => {
                                     id="name"
                                     className="form__input"
                                     type="text"
-                                    name="name"
-                                    value={formData.name}
+                                    value={user.name}
                                     required
-                                    onChange={handleChange}
+                                    onChange={(e) =>
+                                        setUser({
+                                            ...user,
+                                            name: e.target.value,
+                                        })
+                                    }
                                 />
                             </div>
                             <div className="form__group ma-bt-md">
@@ -142,8 +154,7 @@ const UserProfile = () => {
                                     id="email"
                                     className="form__input"
                                     type="email"
-                                    name="email"
-                                    value={formData.email}
+                                    value={user.email}
                                     required
                                     disabled
                                 />
@@ -151,7 +162,7 @@ const UserProfile = () => {
                             <div className="form__group form__photo-upload">
                                 <img
                                     className="form__user-photo"
-                                    src={formData.photo}
+                                    src={user.photo}
                                     alt="user"
                                 />
                                 <input
