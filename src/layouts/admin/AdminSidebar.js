@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   UserGroupIcon,
@@ -8,7 +8,9 @@ import {
   ChatBubbleLeftIcon,
   ChartBarIcon,
   Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
+import { authService } from "../../services/api";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
@@ -27,13 +29,26 @@ const navigation = [
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      // Redirect to login page after successful logout
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Even if logout fails, redirect to login page
+      navigate('/login');
+    }
+  };
 
   return (
     <aside
       className={`
       ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
-      transition-transform duration-300 ease-in-out
+      transition-transform duration-300 ease-in-out flex flex-col
     `}>
 
       {/* Logo */}
@@ -94,6 +109,17 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
           );
         })}
       </nav>
+
+      {/* Logout Section */}
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors duration-200"
+        >
+          <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+          Đăng xuất
+        </button>
+      </div>
     </aside>
   );
 };
