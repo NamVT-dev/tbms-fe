@@ -21,7 +21,7 @@ axios.interceptors.response.use(
 export const authService = {
     login: (email, password) =>
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}auth/login`,
+            `${process.env.REACT_APP_BACKEND_URL}/auth/login`,
             {
                 email,
                 password,
@@ -33,7 +33,7 @@ export const authService = {
 
     signup: (name, email, password, passwordConfirm) =>
         axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}auth/signup`,
+            `${process.env.REACT_APP_BACKEND_URL}/auth/signup`,
             {
                 name,
                 email,
@@ -86,13 +86,13 @@ export const authService = {
 
 export const userService = {
     getMe: () =>
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/profile`, {
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/auth/profile`, {
             withCredentials: true,
         }),
 
     updatePassword: (passwordCurrent, password, passwordConfirm) =>
         axios.patch(
-            `${process.env.REACT_APP_BACKEND_URL}/api/auth/updatePassword`,
+            `${process.env.REACT_APP_BACKEND_URL}/auth/updatePassword`,
             {
                 passwordCurrent,
                 password,
@@ -104,7 +104,7 @@ export const userService = {
         ),
     updateProfile: (data) => {
         return axios.patch(
-            `${process.env.REACT_APP_BACKEND_URL}/api/auth/update/profile`,
+            `${process.env.REACT_APP_BACKEND_URL}/auth/update/profile`,
             data,
             {
                 withCredentials: true,

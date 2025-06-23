@@ -13,7 +13,7 @@ const PartnerTour = () => {
         const fetchTours = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9999/api/tours/partner",
+                    "http://localhost:9999/tours/partner",
                     {
                         method: "GET",
                         headers: { "Content-Type": "application/json" },

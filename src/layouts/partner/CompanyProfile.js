@@ -5,13 +5,9 @@ import Header from "../../layouts/partner/Header";
 
 const CompanyProfile = () => {
     const [companyData, setCompanyData] = useState({
-        companyName: "",
-        companyDescription: "",
-        companyLocation: { address: "" },
-        contactEmail: "",
-        contactPhone: "",
-        website: "",
-        logo: "",
+        name: "", // tên công ty
+        description: "", // mô tả công ty
+        photo: "", // logo hoặc ảnh đại diện
     });
 
     const navigate = useNavigate();
@@ -20,7 +16,7 @@ const CompanyProfile = () => {
         const fetchProfile = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9999/api/auth/profile",
+                    "http://localhost:9999/auth/profile",
                     {
                         method: "GET",
                         credentials: "include",
@@ -30,16 +26,12 @@ const CompanyProfile = () => {
                 const data = await response.json();
 
                 if (response.ok) {
-                    const user = data.data.user;
-
-                    setCompanyData((prev) => ({
-                        ...prev,
-                        ...user,
-                        companyLocation: {
-                            ...prev.companyLocation,
-                            ...user.companyLocation,
-                        },
-                    }));
+                    const user = data.data.data;
+                    setCompanyData({
+                        name: user.name || "",
+                        description: user.description || "",
+                        photo: user.photo || "",
+                    });
                 } else {
                     alert("Lỗi tải profile: " + data.message);
                 }
@@ -53,36 +45,31 @@ const CompanyProfile = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === "companyLocation.address") {
-            setCompanyData((prev) => ({
-                ...prev,
-                companyLocation: {
-                    ...prev.companyLocation,
-                    address: value,
-                },
-            }));
-        } else {
-            setCompanyData((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
+        setCompanyData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const filteredData = {
+            name: companyData.name,
+            description: companyData.description,
+            photo: companyData.photo,
+        };
+
         try {
             const response = await fetch(
-                "http://localhost:9999/api/auth/update/profile",
+                "http://localhost:9999/auth/update/profile",
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     credentials: "include",
-                    body: JSON.stringify(companyData),
+                    body: JSON.stringify(filteredData),
                 }
             );
 
@@ -114,7 +101,7 @@ const CompanyProfile = () => {
                             ⬅️ Quay về Dashboard
                         </button>
 
-                        <h2 className="text-3xl font-bold text black mb-6">
+                        <h2 className="text-3xl font-bold text-black mb-6">
                             👤 Hồ sơ Công Ty
                         </h2>
 
@@ -125,8 +112,8 @@ const CompanyProfile = () => {
                                 </label>
                                 <input
                                     type="text"
-                                    name="companyName"
-                                    value={companyData.companyName}
+                                    name="name"
+                                    value={companyData.name}
                                     onChange={handleChange}
                                     className="w-full p-3 border border-gray-300 rounded-lg"
                                 />
@@ -136,57 +123,22 @@ const CompanyProfile = () => {
                                     Mô Tả Công Ty
                                 </label>
                                 <textarea
-                                    name="companyDescription"
-                                    value={companyData.companyDescription}
+                                    name="description"
+                                    value={companyData.description}
                                     onChange={handleChange}
                                     className="w-full p-3 border border-gray-300 rounded-lg min-h-[100px]"
                                 />
                             </div>
                             <div>
                                 <label className="block font-medium mb-1">
-                                    Địa Chỉ
+                                    Ảnh đại diện / Logo
                                 </label>
                                 <input
                                     type="text"
-                                    name="companyLocation.address"
-                                    value={companyData.companyLocation.address}
+                                    name="photo"
+                                    value={companyData.photo}
                                     onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-1">
-                                    Email Liên Hệ
-                                </label>
-                                <input
-                                    type="email"
-                                    name="contactEmail"
-                                    value={companyData.contactEmail}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-1">
-                                    Số Điện Thoại
-                                </label>
-                                <input
-                                    type="text"
-                                    name="contactPhone"
-                                    value={companyData.contactPhone}
-                                    onChange={handleChange}
-                                    className="w-full p-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-1">
-                                    Website
-                                </label>
-                                <input
-                                    type="url"
-                                    name="website"
-                                    value={companyData.website}
-                                    onChange={handleChange}
+                                    placeholder="URL ảnh"
                                     className="w-full p-3 border border-gray-300 rounded-lg"
                                 />
                             </div>

@@ -10,7 +10,7 @@ const BookingList = () => {
         const fetchBookings = async () => {
             try {
                 const response = await fetch(
-                    "http://localhost:9999/api/bookings/partner",
+                    "http://localhost:9999/bookings/partner/bookings",
                     {
                         method: "GET",
                         credentials: "include",
