@@ -19,8 +19,7 @@ const UserProfile = () => {
       try {
         const response = await userService.getMe();
 
-        const userData = response.data?.data?.user;
-
+        const userData = response.data?.data?.data;
         if (!userData) {
           console.error("Không tìm thấy dữ liệu người dùng", response.data);
           return;
