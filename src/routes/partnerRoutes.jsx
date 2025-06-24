@@ -1,7 +1,7 @@
 import { lazy } from "react";
 
-const PartnerDashboard = lazy(() =>
-  import("../layouts/partner/PartnerDashboard")
+const PartnerDashboard = lazy(
+  () => import("../layouts/partner/PartnerDashboard")
 );
 const CreateTour = lazy(() => import("../components/partner/CreateTour"));
 const PartnerTour = lazy(() => import("../components/partner/PartnerTour"));

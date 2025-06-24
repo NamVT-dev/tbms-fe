@@ -114,8 +114,8 @@ function ConfirmEmailForm() {
             {resendLoading
               ? "Đang gửi lại..."
               : resendCooldown > 0
-              ? `Gửi lại sau ${resendCooldown}s`
-              : "Gửi lại mã xác nhận"}
+                ? `Gửi lại sau ${resendCooldown}s`
+                : "Gửi lại mã xác nhận"}
           </button>
 
           {resendMessage && (

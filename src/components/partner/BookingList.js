@@ -59,10 +59,10 @@ const BookingList = () => {
                     ? value === "pending"
                       ? "bg-yellow-500 text-white"
                       : value === "confirmed"
-                      ? "bg-green-600 text-white"
-                      : value === "cancelled"
-                      ? "bg-red-600 text-white"
-                      : "bg-gray-800 text-white"
+                        ? "bg-green-600 text-white"
+                        : value === "cancelled"
+                          ? "bg-red-600 text-white"
+                          : "bg-gray-800 text-white"
                     : "bg-gray-200 text-gray-800"
                 }`}
                 onClick={() => setFilterStatus(value)}
@@ -109,15 +109,15 @@ const BookingList = () => {
                           booking.status === "confirmed"
                             ? "bg-green-600"
                             : booking.status === "pending"
-                            ? "bg-yellow-500"
-                            : "bg-red-600"
+                              ? "bg-yellow-500"
+                              : "bg-red-600"
                         }`}
                       >
                         {booking.status === "confirmed"
                           ? "Đã xác nhận"
                           : booking.status === "pending"
-                          ? "Chờ duyệt"
-                          : "Đã hủy"}
+                            ? "Chờ duyệt"
+                            : "Đã hủy"}
                       </span>
                     </td>
                   </tr>

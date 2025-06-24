@@ -6,14 +6,14 @@ const LoginForm = lazy(() => import("../components/auth/LoginForm"));
 const SignUpForm = lazy(() => import("../components/auth/SignUp"));
 const TourDetailPage = lazy(() => import("../pages/TourDetailPage"));
 const BookingHistoryPage = lazy(() => import("../pages/BookingHistoryPage"));
-const ConfirmEmailForm = lazy(() =>
-  import("../components/auth/ConfirmEmailForm")
+const ConfirmEmailForm = lazy(
+  () => import("../components/auth/ConfirmEmailForm")
 );
-const ForgotPasswordForm = lazy(() =>
-  import("../components/auth/ForgotPasswordForm")
+const ForgotPasswordForm = lazy(
+  () => import("../components/auth/ForgotPasswordForm")
 );
-const ResetPasswordForm = lazy(() =>
-  import("../components/auth/ResetPasswordForm")
+const ResetPasswordForm = lazy(
+  () => import("../components/auth/ResetPasswordForm")
 );
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 

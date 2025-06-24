@@ -1,9 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import {
-  Bars3Icon,
-} from '@heroicons/react/24/outline';
+import { Bars3Icon } from "@heroicons/react/24/outline";
 
 const AdminHeader = ({ setSidebarOpen }) => {
   return (
@@ -20,11 +18,11 @@ const AdminHeader = ({ setSidebarOpen }) => {
               <span className="sr-only">Open sidebar</span>
               <Bars3Icon className="w-6 h-6" />
             </button>
-          </div>   
+          </div>
         </div>
       </div>
     </header>
   );
 };
 
-export default AdminHeader; 
+export default AdminHeader;

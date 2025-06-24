@@ -428,8 +428,8 @@ export default function PendingTours() {
                   {processing
                     ? "Đang xử lý..."
                     : actionType === "approve"
-                    ? "Phê duyệt"
-                    : "Từ chối"}
+                      ? "Phê duyệt"
+                      : "Từ chối"}
                 </button>
                 <button
                   type="button"
