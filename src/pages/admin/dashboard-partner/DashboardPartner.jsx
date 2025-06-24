@@ -29,7 +29,7 @@ const DashboardPartner = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(
     currentDate.getMonth() + 1
-  ); // JS: 0-11
+  );
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +43,8 @@ const DashboardPartner = () => {
       });
       if (res.data.status === "success") {
         setStats(res.data.data);
+      } else {
+        console.error("Lỗi: Không nhận được dữ liệu thành công.");
       }
     } catch (error) {
       console.error("Lỗi khi tải dữ liệu tổng quan đối tác:", error);
@@ -65,89 +67,87 @@ const DashboardPartner = () => {
 
   return (
     <div>
-      <div>
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-            <p className="text-sm text-gray-600 mt-1">
-              Tổng quan hoạt động trong tháng {selectedMonth}/{selectedYear}
-            </p>
-          </div>
-
-          {/* Bộ chọn tháng/năm */}
-          <div className="flex space-x-2">
-            <select
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              className="border px-3 py-1 rounded-md text-sm"
-            >
-              {[...Array(12)].map((_, idx) => (
-                <option key={idx + 1} value={idx + 1}>
-                  Tháng {idx + 1}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-              className="border px-3 py-1 rounded-md text-sm"
-            >
-              {[2023, 2024, 2025, 2026].map((year) => (
-                <option key={year} value={year}>
-                  Năm {year}
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Tổng quan hoạt động trong tháng {selectedMonth}/{selectedYear}
+          </p>
         </div>
 
+        <div className="flex space-x-2">
+          <select
+            value={selectedMonth}
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            className="border px-3 py-1 rounded-md text-sm"
+          >
+            {[...Array(12)].map((_, idx) => (
+              <option key={idx + 1} value={idx + 1}>
+                Tháng {idx + 1}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            className="border px-3 py-1 rounded-md text-sm"
+          >
+            {[2023, 2024, 2025, 2026].map((year) => (
+              <option key={year} value={year}>
+                Năm {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             title="Doanh thu"
             value={
-              stats.totalRevenue.toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }) || "0 đ"
+              stats?.totalRevenue
+                ? stats.totalRevenue.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : "0 đ"
             }
             icon={BanknotesIcon}
           />
           <StatCard
             title="Số đơn đặt"
-            value={stats.totalBookings || 0}
+            value={stats?.totalBookings ?? 0}
             icon={ShoppingBagIcon}
           />
           <StatCard
             title="Tổng người tham gia"
-            value={stats.totalParticipants || 0}
+            value={stats?.totalParticipants ?? 0}
             icon={UserGroupIcon}
           />
           <StatCard
             title="Số tour hoạt động"
-            value={stats.activeToursCount || 0}
+            value={stats?.activeToursCount ?? 0}
             icon={RectangleGroupIcon}
           />
           <StatCard
             title="Doanh thu TB / tour"
             value={
-              stats.averageRevenuePerTour.toLocaleString("vi-VN", {
-                style: "currency",
-                currency: "VND",
-              }) || "0 đ"
+              stats?.averageRevenuePerTour
+                ? stats.averageRevenuePerTour.toLocaleString("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                  })
+                : "0 đ"
             }
             icon={ChartBarIcon}
           />
         </div>
-      </div>
+      )}
 
-      {/* Revenue Chart */}
       <RevenueChart />
-
-      {/* Top Revenue Tours*/}
       <TopRevenueTours />
-
-      {/* Booking Details Table */}
       <BookingDetailsTable />
     </div>
   );

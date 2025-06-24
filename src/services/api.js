@@ -96,6 +96,15 @@ export const userService = {
         withCredentials: true,
       }
     ),
+  updateProfile: (data) => {
+    return axios.patch(
+      `${process.env.REACT_APP_BACKEND_URL}auth/profile`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
+  },
 };
 
 export function getTours(params) {

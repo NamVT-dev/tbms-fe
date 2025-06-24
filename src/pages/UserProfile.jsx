@@ -4,6 +4,10 @@ import "../styles/profile.css";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    photo: "",
+  });
   const [passwords, setPasswords] = useState({
     current: "",
     new: "",
@@ -11,26 +15,58 @@ const UserProfile = () => {
   });
 
   useEffect(() => {
-    userService
-      .getMe()
-      .then((response) => {
-        const userData = response.data?.data?.data;
-        if (!userData)
+    const fetchProfile = async () => {
+      try {
+        const response = await userService.getMe();
+
+        const userData = response.data?.data?.user;
+
+        if (!userData) {
           console.error("Không tìm thấy dữ liệu người dùng", response.data);
+          return;
+        }
+
         setUser(userData);
-      })
-      .catch((error) =>
-        console.error("Lỗi khi lấy dữ liệu người dùng:", error)
-      );
+        setFormData({
+          name: userData.name || "",
+          photo: userData.photo || "/images/default-user.png",
+        });
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu người dùng:", error);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  const handleFileChange = async (e) => {};
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prev) => ({ ...prev, photo: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handlePasswordChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = async (e) => {};
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const { name, photo } = formData;
+      await userService.updateProfile({ name, photo });
+
+      alert("Cập nhật thông tin thành công!");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật thông tin:", error.response || error);
+      alert("Cập nhật thất bại.");
+    }
+  };
 
   const handlePasswordUpdate = (e) => {
     e.preventDefault();
@@ -52,9 +88,9 @@ const UserProfile = () => {
         <nav className="user-view__menu">
           <ul className="side-nav">
             <NavItem link="#" text="Cài Đặt" icon="settings" active={true} />
-            <NavItem link="#" text="Tour của tôi" icon="briefcase" />
-            <NavItem link="#" text="Đánh giá" icon="star" />
-            <NavItem link="#" text="Lịch sử thanh toán" icon="credit-card" />
+            <NavItem link="#" text="Tour Của Tôi" icon="briefcase" />
+            <NavItem link="#" text="Đánh Giá" icon="star" />
+            <NavItem link="#" text="Lịch Sử Thanh Toán" icon="credit-card" />
           </ul>
         </nav>
         <div className="user-view__content">
@@ -71,7 +107,12 @@ const UserProfile = () => {
                   type="text"
                   value={user.name}
                   required
-                  onChange={(e) => setUser({ ...user, name: e.target.value })}
+                  onChange={(e) =>
+                    setUser({
+                      ...user,
+                      name: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="form__group ma-bt-md">
