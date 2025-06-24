@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }) => {
             window.location.href = "/";
             return true;
         } catch (err) {
+            console.log(err);
             throw new Error("Không thể đăng xuất");
         }
     };
