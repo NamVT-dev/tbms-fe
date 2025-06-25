@@ -26,8 +26,10 @@ const TourInfo = ({ tour, onSelectLocation }) => {
 
     if (!selectedDate) {
       alert("Vui lòng chọn ngày khởi hành.");
+      return;
     } else if (!isValidDate) {
       alert("Ngày khởi hành không hợp lệ.");
+      return;
     }
     try {
       const res = await getBookingSession(tour.id, numAdults, selectedDate);
