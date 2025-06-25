@@ -7,6 +7,9 @@ import { getBookingSession } from "../../services/api";
 const TourInfo = ({ tour, onSelectLocation }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [numAdults, setNumAdults] = useState(2);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const totalPrice = numAdults * (tour?.price || 0);
   useEffect(() => {}, [tour]);
   const handleScrollToMap = (location) => {
@@ -19,7 +22,19 @@ const TourInfo = ({ tour, onSelectLocation }) => {
     }
   };
 
-  const handleBooking = async () => {
+  const confirmBooking = async () => {
+    try {
+      setIsLoading(true);
+      const res = await getBookingSession(tour.id, numAdults, selectedDate);
+      window.location.href = res.data.session?.url;
+    } catch (error) {
+      window.alert("Xảy ra lỗi khi đặt tour. Hãy thử lại sau!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBookingClick = () => {
     const isValidDate = tour?.startDates?.some((date) =>
       dayjs(date).isSame(selectedDate, "day")
     );
@@ -31,16 +46,48 @@ const TourInfo = ({ tour, onSelectLocation }) => {
       alert("Ngày khởi hành không hợp lệ.");
       return;
     }
-    try {
-      const res = await getBookingSession(tour.id, numAdults, selectedDate);
-      window.location.href = res.data.session?.url;
-    } catch (error) {
-      window.alert("Xảy ra lỗi khi đặt tour. Hãy thử lại sau!");
-    }
+    setIsModalOpen(true);
   };
 
   return (
     <section className="container max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-md text-center">
+            <h2 className="text-xl font-semibold text-cyan-700 mb-4">
+              Xác nhận đặt tour
+            </h2>
+            <p className="mb-2">
+              <strong>Ngày khởi hành:</strong>{" "}
+              {selectedDate
+                ? dayjs(selectedDate).format("DD/MM/YYYY")
+                : "Chưa chọn"}
+            </p>
+            <p className="mb-2">
+              <strong>Số người lớn:</strong> {numAdults}
+            </p>
+            <p className="mb-4 text-orange-600 font-medium">
+              <strong>Tổng giá:</strong> {totalPrice.toLocaleString()} đ
+            </p>
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={confirmBooking}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Đang tải..." : "Xác nhận"}
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg"
+              >
+                Huỷ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Left: Các điểm đến */}
       <div className="md:col-span-2 bg-white rounded-2xl p-6">
         <h1 className="text-2xl font-semibold mb-4 text-cyan-700">
@@ -152,7 +199,7 @@ const TourInfo = ({ tour, onSelectLocation }) => {
         {/* Nút đặt tour */}
         <div className="text-center mt-6">
           <button
-            onClick={handleBooking}
+            onClick={handleBookingClick}
             className="bg-cyan-500 hover:bg-cyan-700 text-white px-6 py-3 rounded-xl text-lg"
           >
             Yêu cầu đặt
