@@ -6,10 +6,16 @@ import {
   ClipboardDocumentListIcon,
   CalendarDaysIcon,
   ArrowRightOnRectangleIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/outline";
 
 const navigation = [
   { name: "Dashboard", href: "/partner/dashboard", icon: HomeIcon },
+  {
+    name: "Thống kê",
+    href: "/partner/statistics",
+    icon: ChartBarIcon,
+  },
   {
     name: "Tạo Tour mới",
     href: "/partner/tours/create",
