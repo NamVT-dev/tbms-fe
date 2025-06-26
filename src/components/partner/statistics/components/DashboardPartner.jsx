@@ -7,8 +7,8 @@ import {
   RectangleGroupIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
-import RevenueChart from "./RevenueChart";
-import TopRevenueTours from "./TopRevenueTours";
+import RevenueChart from "../RevenueChart";
+import TopRevenueTours from "../TopRevenueTours";
 import BookingDetailsTable from "./BookingDetailsTable";
 
 const StatCard = ({ title, value, icon: Icon }) => (
