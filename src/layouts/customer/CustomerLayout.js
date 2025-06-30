@@ -1,10 +1,11 @@
-import Header from "../components/common/Header";
-import Footer from "../components/common/Footer";
 import { Outlet } from "react-router-dom";
-import { AuthProvider } from "../contexts/AuthContext";
-import { TourProvider } from "../contexts/TourContext";
+import { AuthProvider } from "../../contexts/AuthContext";
+import { TourProvider } from "../../contexts/TourContext";
 
-const MainLayout = () => {
+import Header from "../../components/common/Header";
+import Footer from "../../components/common/Footer";
+
+const CustomerLayout = () => {
   return (
     <TourProvider>
       <AuthProvider>
@@ -25,4 +26,4 @@ const MainLayout = () => {
   );
 };
 
-export default MainLayout;
+export default CustomerLayout;

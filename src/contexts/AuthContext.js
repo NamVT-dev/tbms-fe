@@ -1,6 +1,5 @@
-// src/context/AuthContext.js
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { authService } from "../services/api";
+import { createContext, useContext, useEffect, useState } from "react";
+import { authService, userService } from "../services/api";
 import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
@@ -8,13 +7,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Check if user is already logged in
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    async function fetchUser() {
+      try {
+        const res = await userService.getMe();
+        const user = res.data.data.data;
+        if (user) {
+          setUser(user);
+        }
+        setLoading(false);
+      } catch (error) {}
     }
-    setLoading(false);
+    fetchUser();
   }, []);
 
   const login = async (email, password) => {
@@ -22,7 +27,6 @@ export const AuthProvider = ({ children }) => {
       const res = await authService.login(email, password);
       if (res.data.status === "success") {
         setUser(res.data.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.data.user));
         return res.data.data.user;
       }
     } catch (err) {
@@ -40,7 +44,6 @@ export const AuthProvider = ({ children }) => {
       );
       if (res.data.status === "success") {
         setUser(res.data.data.user);
-        localStorage.setItem("user", JSON.stringify(res.data.data.user));
         return true;
       }
     } catch (err) {
@@ -52,11 +55,65 @@ export const AuthProvider = ({ children }) => {
     try {
       await authService.logout();
       setUser(null);
-      localStorage.removeItem("user");
       navigate("/");
       return true;
     } catch (err) {
       throw new Error("Không thể đăng xuất");
+    }
+  };
+
+  const updatePassword = async (passwordCurrent, password, passwordConfirm) => {
+    try {
+      await userService.updatePassword(
+        passwordCurrent,
+        password,
+        passwordConfirm
+      );
+      return true;
+    } catch (err) {
+      throw new Error(err.response?.data?.message || "Không thể đổi mật khẩu");
+    }
+  };
+
+  const forgotPassword = async (email) => {
+    try {
+      const res = await authService.forgotPassword(email);
+      if (res.data.status === "success") return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message ||
+          "Có vấn đề xảy ra trong quá trình xác nhận!"
+      );
+    }
+  };
+
+  const resetPassword = async (email, token, password, passwordConfirm) => {
+    try {
+      const res = await authService.resetPassword(
+        email,
+        token,
+        password,
+        passwordConfirm
+      );
+      if (res.data.status === "success") return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message || "Không thể đặt lại mật khẩu"
+      );
+    }
+  };
+
+  const updateProfile = async (data) => {
+    try {
+      const res = await userService.updateProfile(data);
+      if (res.data.status === "success") {
+        setUser(res.data.data.user);
+      }
+      return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message || "Không thể cập nhật hồ sơ"
+      );
     }
   };
 
@@ -68,7 +125,11 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         logout,
+        updatePassword,
+        forgotPassword,
+        resetPassword,
         isAuthenticated: !!user,
+        updateProfile,
       }}
     >
       {children}

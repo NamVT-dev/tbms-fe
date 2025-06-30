@@ -11,6 +11,12 @@ import {
   UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
+// Hàm build URL đảm bảo có dấu "/" đúng
+const buildUrl = (path) => {
+  const base = process.env.REACT_APP_BACKEND_URL || "";
+  return `${base.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
+};
+
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [total, setTotal] = useState(0);
@@ -38,23 +44,13 @@ export default function Users() {
         limit: limit,
       });
 
-      if (search.trim()) {
-        params.append("search", search.trim());
-      }
-
-      if (role) {
-        params.append("role", role);
-      }
-
-      if (status) {
-        params.append("status", status);
-      }
+      if (search.trim()) params.append("search", search.trim());
+      if (role) params.append("role", role);
+      if (status) params.append("status", status);
 
       const res = await axios.get(
-        `http://localhost:9999/admin/users?${params.toString()}`,
-        {
-          withCredentials: true,
-        }
+        buildUrl(`admin/users?${params.toString()}`),
+        { withCredentials: true }
       );
 
       if (res.data && res.data.status === "success") {
@@ -102,7 +98,7 @@ export default function Users() {
     setCreateLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:9999/admin/createPartner",
+        buildUrl("admin/createPartner"),
         partnerForm,
         {
           withCredentials: true,
@@ -113,7 +109,6 @@ export default function Users() {
         alert("Tạo tài khoản đối tác thành công!");
         setShowCreatePartnerModal(false);
         setPartnerForm({ name: "", email: "", description: "" });
-        // Refresh the users list
         getUsers();
       }
     } catch (err) {
@@ -123,6 +118,28 @@ export default function Users() {
       );
     } finally {
       setCreateLoading(false);
+    }
+  };
+
+  const handleBanUser = async (userId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn cấm người dùng này?")) return;
+
+    try {
+      const response = await axios.patch(
+        buildUrl(`admin/users/${userId}/ban`),
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data && response.data.status === "success") {
+        alert("Đã cấm người dùng thành công!");
+        getUsers();
+      }
+    } catch (err) {
+      console.error("Lỗi khi cấm người dùng:", err);
+      alert(err.response?.data?.message || "Có lỗi xảy ra khi cấm người dùng");
     }
   };
 
@@ -147,6 +164,7 @@ export default function Users() {
 
   return (
     <div className="p-6">
+      {/* Tiêu đề + Button tạo tài khoản */}
       <div className="sm:flex sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">
@@ -156,18 +174,16 @@ export default function Users() {
             Danh sách tất cả người dùng trong hệ thống.
           </p>
         </div>
-        <div>
-          <button
-            onClick={() => setShowCreatePartnerModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            <UserPlusIcon className="h-5 w-5 mr-2" />
-            Tạo tài khoản đối tác
-          </button>
-        </div>
+        <button
+          onClick={() => setShowCreatePartnerModal(true)}
+          className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm"
+        >
+          <UserPlusIcon className="h-5 w-5 mr-2" />
+          Tạo tài khoản đối tác
+        </button>
       </div>
 
-      {/* Status Cards */}
+      {/* Thống kê tổng */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
@@ -182,113 +198,58 @@ export default function Users() {
             </div>
           </div>
         </div>
-
-        {/* <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="bg-green-50 rounded-lg p-3">
-              <UserIcon className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Đang hoạt động</p>
-              <p className="text-2xl font-semibold text-gray-900">
-                {users.filter(u => u.active === true).length}
-              </p>
-            </div>
-          </div>
-        </div> */}
-
-        {/* <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <div className="bg-red-50 rounded-lg p-3">
-              <NoSymbolIcon className="w-6 h-6 text-red-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Bị chặn</p>
-              <p className="text-2xl font-semibold text-gray-900">
-              {total - users.filter(u => u.active === true).length}
-              </p>
-            </div>
-          </div>
-        </div> */}
       </div>
 
-      {/* Search and Filters */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
-          <div className="flex-1 max-w-lg">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Tìm kiếm theo tên, email..."
-                value={search}
-                onChange={(e) => {
-                  setPage(1);
-                  setSearch(e.target.value);
-                }}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FunnelIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <select
-                value={role}
-                onChange={(e) => {
-                  setPage(1);
-                  setRole(e.target.value);
-                }}
-                className="pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Tất cả vai trò</option>
-                <option value="customer">Customer</option>
-                <option value="partner">Partner</option>
-              </select>
-            </div>
-            <div className="relative">
-              {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FunnelIcon className="h-5 w-5 text-gray-400" />
-              </div> */}
-              {/* <select
-                value={status}
-                onChange={(e) => {
-                  setPage(1);
-                  setStatus(e.target.value);
-                }}
-                className="pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="">Tất cả trạng thái</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select> */}
-            </div>
-          </div>
+      {/* Tìm kiếm + filter */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="relative w-full sm:max-w-md">
+          <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-2.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên, email..."
+            value={search}
+            onChange={(e) => {
+              setPage(1);
+              setSearch(e.target.value);
+            }}
+            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+        <div className="relative">
+          <FunnelIcon className="h-5 w-5 absolute left-3 top-2.5 text-gray-400" />
+          <select
+            value={role}
+            onChange={(e) => {
+              setPage(1);
+              setRole(e.target.value);
+            }}
+            className="pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <option value="">Tất cả vai trò</option>
+            <option value="customer">Customer</option>
+            <option value="partner">Partner</option>
+          </select>
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+      {/* Bảng users */}
+      <div className="bg-white shadow rounded-lg overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Tên
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Vai trò
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Trạng thái
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                 Hành động
               </th>
             </tr>
@@ -299,26 +260,16 @@ export default function Users() {
                 <tr key={user._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <UserIcon className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </div>
-                      </div>
+                      <UserIcon className="h-6 w-6 text-gray-400 mr-2" />
+                      {user.name}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.role}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 text-gray-500">{user.email}</td>
+                  <td className="px-6 py-4 text-gray-500">{user.role}</td>
+                  <td className="px-6 py-4">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.active === true
+                      className={`px-2 inline-flex text-xs font-semibold rounded-full ${
+                        user.active
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
                       }`}
@@ -326,12 +277,10 @@ export default function Users() {
                       {user.active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="px-6 py-4 text-right">
                     <button
-                      className="text-red-600 hover:text-red-900"
-                      onClick={() => {
-                        /* Thêm xử lý chặn */
-                      }}
+                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleBanUser(user._id)}
                     >
                       <NoSymbolIcon className="h-5 w-5" />
                     </button>
@@ -340,7 +289,10 @@ export default function Users() {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-sm text-gray-500"
+                >
                   Không có dữ liệu
                 </td>
               </tr>
@@ -349,23 +301,24 @@ export default function Users() {
         </table>
       </div>
 
-      <div className="flex justify-between items-center mt-6">
-        <div className="text-sm text-gray-700">
-          Hiển thị {users.length} trên tổng số {total} người dùng
+      {/* Phân trang */}
+      <div className="mt-6 flex justify-between items-center">
+        <div className="text-sm text-gray-600">
+          Hiển thị {users.length} / {total} người dùng
         </div>
-        <div className="flex gap-2">
+        <div className="flex space-x-2">
           <button
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={page === 1}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            className="px-3 py-1 border rounded disabled:opacity-50"
           >
             Trước
           </button>
-          <div className="flex items-center px-4">Trang {page}</div>
+          <span className="px-4 py-1">Trang {page}</span>
           <button
             onClick={() => setPage((prev) => prev + 1)}
             disabled={users.length < limit}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+            className="px-3 py-1 border rounded disabled:opacity-50"
           >
             Sau
           </button>

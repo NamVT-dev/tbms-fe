@@ -9,6 +9,12 @@ const Header = () => {
   const menuRef = useRef(null);
 
   useEffect(() => {
+    if (user && !user.active) {
+      navigate("/confirm-email");
+    }
+  }, [navigate, user]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
@@ -44,18 +50,16 @@ const Header = () => {
           {/* Navigation Menu */}
           <nav className="hidden md:flex gap-6 h-full items-center">
             {[
-              "Tìm du thuyền",
-              "Tìm vé máy bay",
-              "Tìm khách sạn",
-              "Doanh nghiệp",
-              "Blog",
+              { label: "Tìm Tour", href: "/" },
+              { label: "Blog", href: "/" },
+              { label: "Lịch sử", href: "/booking-history" },
             ].map((item, index) => (
               <a
                 key={index}
-                href="/"
+                href={item.href}
                 className="text-lg font-medium hover:text-blue-600 transition-colors h-full flex items-center"
               >
-                {item}
+                {item.label}
               </a>
             ))}
           </nav>
@@ -74,8 +78,8 @@ const Header = () => {
             >
               <path d="M21.384,17.752a2.108,2.108,0,0,1-.522,3.359,7.543,7.543,0,0,1-5.476.642C10.5,20.523,3.477,13.5,2.247,8.614a7.543,7.543,0,0,1,.642-5.476,2.108,2.108,0,0,1,3.359-.522L8.333,4.7a2.094,2.094,0,0,1,.445,2.328A3.877,3.877,0,0,1,8,8.2c-2.384,2.384,5.417,10.185,7.8,7.8a3.877,3.877,0,0,1,1.173-.781,2.092,2.092,0,0,1,2.328.445Z"></path>
             </svg>
-            <a href="tel:0922222016" className="text-lg font-medium">
-              Hotline: 0922222016
+            <a href="tel:0123456789" className="text-lg font-medium">
+              Hotline: 0123456789
             </a>
           </div>
 
