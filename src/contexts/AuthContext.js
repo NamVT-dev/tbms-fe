@@ -62,6 +62,19 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updatePassword = async (passwordCurrent, password, passwordConfirm) => {
+    try {
+      await userService.updatePassword(
+        passwordCurrent,
+        password,
+        passwordConfirm
+      );
+      return true;
+    } catch (err) {
+      throw new Error(err.response?.data?.message || "Không thể đổi mật khẩu");
+    }
+  };
+
   const forgotPassword = async (email) => {
     try {
       const res = await authService.forgotPassword(email);
@@ -90,6 +103,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data) => {
+    try {
+      const res = await userService.updateProfile(data);
+      if (res.data.status === "success") {
+        setUser(res.data.data.user);
+      }
+      return true;
+    } catch (err) {
+      throw new Error(
+        err.response?.data?.message || "Không thể cập nhật hồ sơ"
+      );
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -98,9 +125,11 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         logout,
+        updatePassword,
         forgotPassword,
         resetPassword,
         isAuthenticated: !!user,
+        updateProfile,
       }}
     >
       {children}

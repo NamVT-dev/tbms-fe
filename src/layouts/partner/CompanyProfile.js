@@ -48,23 +48,26 @@ const CompanyProfile = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCompanyData((prev) => ({ ...prev, photo: file }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const filteredData = {
-      name: companyData.name,
-      description: companyData.description,
-      photo: companyData.photo,
-    };
+    const form = new FormData();
+
+    form.append("name", companyData.name);
+    form.append("description", companyData.description);
+    form.append("photo", companyData.photo);
 
     try {
       const response = await fetch("http://localhost:9999/auth/profile", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: form,
         credentials: "include",
-        body: JSON.stringify(filteredData),
       });
 
       const data = await response.json();
@@ -123,14 +126,24 @@ const CompanyProfile = () => {
                 <label className="block font-medium mb-1">
                   Ảnh đại diện / Logo
                 </label>
-                <input
-                  type="text"
-                  name="photo"
-                  value={companyData.photo}
-                  onChange={handleChange}
-                  placeholder="URL ảnh"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                />
+                <div className="flex items-center text-lg">
+                  <img
+                    className="w-[5rem] h-[5rem] rounded-full mr-8"
+                    src={
+                      companyData?.photo instanceof File
+                        ? URL.createObjectURL(companyData.photo)
+                        : companyData.photo
+                    }
+                    alt="user"
+                  />
+                  <input
+                    type="file"
+                    name="photo"
+                    onChange={handleFileChange}
+                    placeholder="URL ảnh"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
               </div>
               <button
                 type="submit"
