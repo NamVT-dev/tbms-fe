@@ -12,8 +12,8 @@ const TourHeader = ({ tour }) => {
         <div className="flex flex-wrap items-center gap-2 mt-2">
           <div className="flex items-center gap-1 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-sm">
             <FaStar className="text-yellow-500" />
-            <span>{tour.rating}</span>
-            <span>({tour.reviews} đánh giá)</span>
+            <span>{tour.ratingsAverage}</span>
+            <span>({tour.ratingsQuantity} đánh giá)</span>
           </div>
 
           <div className="flex items-center flex-wrap gap-1 text-gray-600 text-sm">

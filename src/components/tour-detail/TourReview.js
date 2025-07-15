@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 const TourReviews = ({ tourId }) => {
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!tourId) return;
@@ -14,11 +14,11 @@ const TourReviews = ({ tourId }) => {
         const res = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}reviews/tour/${tourId}`
         );
-        setReviews(res.data.data);
+        setReviews(res.data.data || []);
+        setError("");
       } catch (err) {
         console.error("Lỗi khi lấy đánh giá:", err);
-      } finally {
-        setLoading(false);
+        setError("Không thể tải đánh giá.");
       }
     };
 
@@ -31,17 +31,22 @@ const TourReviews = ({ tourId }) => {
         Đánh giá Tour
       </h2>
 
-      {loading ? (
-        <p>Đang tải đánh giá...</p>
-      ) : reviews.length === 0 ? (
-        <p>Chưa có đánh giá nào cho tour này.</p>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
+      {reviews.length === 0 ? (
+        <p className="text-gray-500">Chưa có đánh giá nào cho tour này.</p>
       ) : (
         <ul className="space-y-4">
           {reviews.map((rev) => (
-            <li key={rev._id} className="border rounded-lg p-4 bg-gray-50">
-              <div className="text-yellow-500">
-                {"⭐".repeat(rev.rating)}{" "}
-                <span className="text-gray-600 text-sm ml-2">
+            <li
+              key={rev._id}
+              className="border rounded-lg p-4 bg-gray-50 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <div className="text-yellow-500 text-lg">
+                  {"⭐".repeat(rev.rating)}
+                </div>
+                <span className="text-gray-600 text-sm ml-2 italic">
                   {rev.user?.name || "Người dùng ẩn danh"}
                 </span>
               </div>

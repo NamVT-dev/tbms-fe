@@ -1,14 +1,32 @@
+import React, { useContext } from "react";
 import HeroSection from "../components/main/HeroSection";
-import TouchList from "../components/main/TourList";
+import TourList from "../components/main/TourList";
+import { TourContext } from "../contexts/TourContext";
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
+  const { tours } = useContext(TourContext);
+  const navigate = useNavigate();
+
   return (
     <>
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Touch List Section */}
-      <TouchList />
+      {/* Tour List Section */}
+      <TourList
+        tours={tours}
+        paginated={false} // Không phân trang frontend
+      />
+
+      <div className="flex justify-center mt-4">
+        <button
+          className="bg-cyan-500 text-white px-6 py-2 rounded-lg hover:bg-cyan-600"
+          onClick={() => navigate("/all-tours")}
+        >
+          Xem tất cả tour
+        </button>
+      </div>
     </>
   );
 }
