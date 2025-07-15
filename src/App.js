@@ -1,23 +1,8 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/HomePage";
-import MainLayout from "./layouts/MainLayout";
-import { TourProvider } from "./contexts/TourContext";
-function App() {
-  return (
-    <TourProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<MainLayout />}>
-              <Route path="/" element={<HomePage />} />
+import { RouterProvider } from "react-router-dom";
+import router from "./routes";
 
-              {/* other routes here*/}
-            </Route>
-          </Routes>
-        </div>
-      </Router>
-    </TourProvider>
-  );
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;

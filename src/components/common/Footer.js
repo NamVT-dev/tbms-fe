@@ -1,13 +1,10 @@
-import React from "react";
-import logo from "../../assets/fvivu.png";
-
 const Footer = () => {
   return (
     <footer className="bg-[#0E1B33] text-white pt-10 pb-6 px-6 md:px-16">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Cột 1: Logo + địa chỉ */}
         <div>
-          <img src={logo} alt="Mixivivu Logo" className="h-10 mb-4" />
+          <img src="/assets/fvivu.png" alt="fvivu" className="h-10 mb-4" />
           <p>Công ty TNHH Du Lịch và Dịch Vụ fvivu</p>
           <p className="mt-2 text-sm">
             Trường Đại Học FPT <br />
