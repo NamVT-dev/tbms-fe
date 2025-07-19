@@ -1,23 +1,28 @@
 import React, { useState, useContext } from "react";
 import { TourContext } from "../../contexts/TourContext";
-//import banner from "assets/banner.mp4";
+
 const HeroSection = () => {
   const { searchTours } = useContext(TourContext);
-  const [location, setLocation] = useState("");
   const [keyword, setKeyword] = useState("");
   const [price, setPrice] = useState("");
+  const [ratingsAverage, setRatingsAverage] = useState("");
+  const [setIsSearched] = useState(false);
 
   const handleSearch = () => {
     const [minPrice, maxPrice] = price ? price.split("-") : [null, null];
 
     const params = {
       search: keyword,
-      location: location !== "Tất cả địa điểm" ? location : undefined,
+      ratingsAverage:
+        ratingsAverage !== "Tất cả đánh giá"
+          ? Number(ratingsAverage)
+          : undefined,
       minPrice: minPrice ? Number(minPrice) * 1000 : undefined,
       maxPrice: maxPrice ? Number(maxPrice) * 1000 : undefined,
     };
 
     searchTours(params);
+    setIsSearched(true);
   };
   return (
     <>
@@ -76,7 +81,7 @@ const HeroSection = () => {
                 </label>
               </div>
 
-              {/* Location Dropdown */}
+              {/* Ratings Dropdown*/}
               <div className="flex-1">
                 <label className="relative flex items-center border border-gray-300 rounded-2xl">
                   <svg
@@ -87,23 +92,21 @@ const HeroSection = () => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      d="M5.7 15C4.03377 15.6353 3 16.5205 3 17.4997C3 19.4329 7.02944 21 12 21C16.9706 21 21 19.4329 21 17.4997C21 16.5205 19.9662 15.6353 18.3 15M12 9H12.01M18 9C18 13.0637 13.5 15 12 18C10.5 15 6 13.0637 6 9C6 5.68629 8.68629 3 12 3C15.3137 3 18 5.68629 18 9ZM13 9C13 9.55228 12.5523 10 12 10C11.4477 10 11 9.55228 11 9C11 8.44772 11.4477 8 12 8C12.5523 8 13 8.44772 13 9Z"
+                      d="M12 17.75l-6.172 3.245 1.179-6.88L2 8.755l6.914-1.005L12 2.25l3.086 5.5L22 8.755l-5.007 5.36 1.179 6.88z"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     ></path>
                   </svg>
                   <select
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none"
+                    value={ratingsAverage}
+                    onChange={(e) => setRatingsAverage(e.target.value)}
+                    className="p-3 w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none"
                   >
-                    <option>Tất cả địa điểm</option>
-                    <option>Hạ Long</option>
-                    <option>Đà Nẵng</option>
-                    <option>Phú Quốc</option>
-                    <option>Hội An</option>
-                    <option>Huế</option>
+                    <option>Tất cả đánh giá</option>
+                    <option value="5">5 sao</option>
+                    <option value="4">4 sao trở lên</option>
+                    <option value="3">3 sao trở lên</option>
                   </select>
                   <svg
                     className="h-6 w-6 mr-3 text-gray-500"
