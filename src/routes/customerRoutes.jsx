@@ -32,7 +32,6 @@ const customerRoutes = {
     { path: "profile", element: <UserProfile /> },
     { path: "booking-history", element: <BookingHistoryPage /> },
     { path: "all-tours", element: <AllToursPage paginated={false} /> },
-    // thêm các route khác ở đây
   ],
 };
 

@@ -12,14 +12,9 @@ function HomePage() {
     <>
       {/* Hero Section */}
       <HeroSection />
-
       {/* Tour List Section */}
-      <TourList
-        tours={tours}
-        paginated={false} // Không phân trang frontend
-      />
-
-      <div className="flex justify-center mt-4">
+      <TourList tours={tours} paginated={false} />
+      <div className="flex justify-center mt-4 mb-12">
         <button
           className="bg-cyan-500 text-white px-6 py-2 rounded-lg hover:bg-cyan-600"
           onClick={() => navigate("/all-tours")}
