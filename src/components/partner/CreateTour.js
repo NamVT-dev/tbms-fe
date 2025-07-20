@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
+import ReactQuill from "react-quill";
 
+import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css"; // theme đẹp hơn
 
 const CreateTour = () => {
@@ -15,7 +17,7 @@ const CreateTour = () => {
     priceDiscount: "",
     summary: "",
     description: "",
-    imageCover: "",
+    imageCover: null,
     images: [],
     startLocation: {
       address: "",
@@ -26,8 +28,6 @@ const CreateTour = () => {
   });
 
   const [finalPrice, setFinalPrice] = useState(0);
-  const [coverFile, setCoverFile] = useState(null);
-  const [imageFiles, setImageFiles] = useState([]);
   const [dates, setDates] = useState([]);
   const navigate = useNavigate();
 
@@ -53,48 +53,32 @@ const CreateTour = () => {
     }
   };
 
-  const uploadImages = async () => {
-    const form = new FormData();
-    imageFiles.forEach((img) => form.append("images", img));
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls || [];
-  };
-
-  const uploadCover = async () => {
-    if (!coverFile) return null;
-    const form = new FormData();
-    form.append("images", coverFile);
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls?.[0] || null;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = new FormData();
     try {
-      const imageCoverUrl = await uploadCover();
-      const otherImageUrls = await uploadImages();
+      console.log(formData.images);
+      form.append("name", formData.name);
+      form.append("duration", formData.duration);
+      form.append("maxGroupSize", formData.maxGroupSize);
+      form.append("price", formData.price);
+      form.append("summary", formData.summary);
+      form.append("description", formData.description);
+      form.append("imageCover", formData.imageCover);
 
-      const payload = {
-        ...formData,
-        imageCover: imageCoverUrl,
-        images: otherImageUrls,
-        startDates: dates.map((d) => d.toDate()),
-      };
+      for (let i = 0; i < formData.images.length; i++) {
+        form.append("images", formData.images[i]);
+      }
+      dates.forEach((date) => form.append("startDates", date));
 
-      const res = await fetch("http://localhost:9999/tours/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}tours/create`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: form,
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -144,7 +128,7 @@ const CreateTour = () => {
                 name="maxGroupSize"
                 onChange={handleChange}
                 type="number"
-                placeholder="Số lượng tối đa"
+                placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
                 required
               />
@@ -182,7 +166,12 @@ const CreateTour = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setCoverFile(e.target.files[0])}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageCover: e.target.files[0],
+                    }))
+                  }
                 />
               </div>
 
@@ -192,7 +181,12 @@ const CreateTour = () => {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setImageFiles(Array.from(e.target.files))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      images: e.target.files,
+                    }))
+                  }
                 />
               </div>
 
@@ -203,12 +197,16 @@ const CreateTour = () => {
                 className={`${textareaClass} md:col-span-2`}
                 required
               />
-              <textarea
-                name="description"
-                onChange={handleChange}
-                placeholder="Mô tả chi tiết"
-                className={`${textareaClass} md:col-span-2`}
-                required
+              <ReactQuill
+                className="md:col-span-2 mb-20"
+                theme="snow"
+                value={formData.description}
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: value,
+                  }))
+                }
               />
 
               <div className="md:col-span-2">
