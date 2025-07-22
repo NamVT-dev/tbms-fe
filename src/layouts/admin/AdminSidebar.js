@@ -14,11 +14,6 @@ import { authService } from "../../services/api";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
-  {
-    name: "Partner Dashboard",
-    href: "/admin/partner-dashboard",
-    icon: HomeIcon,
-  },
   { name: "Manage Users", href: "/admin/users", icon: UserGroupIcon },
   { name: "Pending Tours", href: "/admin/pending-tours", icon: ClockIcon },
   { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon },
@@ -35,11 +30,11 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     try {
       await authService.logout();
       // Redirect to login page after successful logout
-      navigate('/login');
+      navigate("/login");
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       // Even if logout fails, redirect to login page
-      navigate('/login');
+      navigate("/login");
     }
   };
 
@@ -49,8 +44,8 @@ const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
       fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
       transition-transform duration-300 ease-in-out flex flex-col
-    `}>
-
+    `}
+    >
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
         <Link to="/admin/dashboard" className="flex items-center">
