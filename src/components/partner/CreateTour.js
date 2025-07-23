@@ -203,7 +203,7 @@ const CreateTour = () => {
                 placeholder="Mô tả địa điểm xuất phát"
                 className={inputClass}
               />
-              <div className="flex flex-col">
+             <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh bìa</label>
                 <input
                   type="file"
@@ -228,7 +228,7 @@ const CreateTour = () => {
                 )}
               </div>
 
-              <div className="flex flex-col">
+                     <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh phụ (nhiều)</label>
                 <input
                   type="file"
@@ -258,8 +258,7 @@ const CreateTour = () => {
                 )}
               </div>
 
-              <div className="flex flex-col">
-              </div>
+             
               <textarea
                 name="summary"
                 onChange={handleChange}
@@ -327,7 +326,4 @@ const inputClass =
 const textareaClass =
   "w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm min-h-[120px]";
 
-// // Ẩn input trong date picker
-// const style = document.createElement("style");
-// style.innerHTML = `.custom-calendar input.rmdp-input { display: none !important; }`;
-// document.head.appendChild(style);
+
