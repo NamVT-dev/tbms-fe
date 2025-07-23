@@ -106,7 +106,17 @@ export default function Users() {
       );
 
       if (response.data && response.data.status === "success") {
-        alert("Tạo tài khoản đối tác thành công!");
+        const{emailStatus, user} = response.data.data;
+
+        if(emailStatus === "failed"){
+          alert(
+          `Tạo tài khoản partner thành công, nhưng gửi email thất bại.\n\n` +
+          `Email đối tác: ${user.email}\n\n` +
+          `Vui lòng liên hệ đối tác và hướng dẫn họ truy cập chức năng 'Quên mật khẩu' trên trang đăng nhập để đặt lại mật khẩu.`
+          );
+        }else{
+          alert("Tạo tài khoản đối tác thành công!");
+        } 
         setShowCreatePartnerModal(false);
         setPartnerForm({ name: "", email: "", description: "" });
         getUsers();
