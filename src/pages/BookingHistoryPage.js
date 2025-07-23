@@ -5,6 +5,10 @@ import dayjs from "dayjs";
 const BookingHistoryPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeReviewTourId, setActiveReviewTourId] = useState(null);
+  const [reviewContent, setReviewContent] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -24,6 +28,27 @@ const BookingHistoryPage = () => {
     fetchBookings();
   }, []);
 
+  const handleReviewSubmit = async (tourId) => {
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}reviews`,
+        {
+          tourId,
+          review: reviewContent,
+          rating: reviewRating,
+        },
+        { withCredentials: true }
+      );
+
+      setSuccessMessage("Đã gửi đánh giá thành công.");
+      setActiveReviewTourId(null);
+      setReviewContent("");
+      setReviewRating(5);
+    } catch (err) {
+      console.error("Lỗi gửi đánh giá:", err);
+    }
+  };
+
   if (loading) {
     return <p className="text-center mt-10">Đang tải dữ liệu đặt tour...</p>;
   }
@@ -39,73 +64,130 @@ const BookingHistoryPage = () => {
       </h1>
 
       <div className="space-y-6">
-        {bookings.map((booking) => (
-          <div
-            key={booking._id}
-            className="border rounded-xl p-5 flex flex-col md:flex-row gap-5 shadow-sm bg-white"
-          >
-            {/* Hình ảnh tour */}
-            <img
-              src={booking.tour?.imageCover}
-              alt={booking.tour?.name}
-              className="w-full md:w-48 h-32 object-cover rounded-lg"
-            />
+        {bookings.map((booking) => {
+          const isTourFinished = dayjs().isAfter(
+            dayjs(booking.startDate).add(booking.tour?.duration || 0, "day")
+          );
 
-            {/* Nội dung */}
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-cyan-800">
-                {booking.tour?.name}
-              </h2>
+          return (
+            <div
+              key={booking._id}
+              className="border rounded-xl p-5 flex flex-col md:flex-row gap-5 shadow-sm bg-white"
+            >
+              <img
+                src={booking.tour?.imageCover}
+                alt={booking.tour?.name}
+                className="w-full md:w-48 h-32 object-cover rounded-lg"
+              />
 
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Ngày khởi hành:</strong>{" "}
-                {dayjs(booking.startDate).format("DD/MM/YYYY")}
-              </p>
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-cyan-800">
+                  {booking.tour?.name}
+                </h2>
 
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Số người tham gia:</strong> {booking.numberOfPeople}
-              </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Ngày khởi hành:</strong>{" "}
+                  {dayjs(booking.startDate).format("DD/MM/YYYY")}
+                </p>
 
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Tổng giá:</strong>{" "}
-                <span className="text-orange-600 font-semibold">
-                  {booking.price.toLocaleString()} đ
-                </span>
-              </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Số người tham gia:</strong> {booking.numberOfPeople}
+                </p>
 
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Trạng thái thanh toán:</strong>{" "}
-                {booking.paid ? (
-                  <span className="text-green-600 font-medium">
-                    Đã thanh toán
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Tổng giá:</strong>{" "}
+                  <span className="text-orange-600 font-semibold">
+                    {booking.price.toLocaleString()} đ
                   </span>
-                ) : (
-                  <span className="text-red-500 font-medium">
-                    Chưa thanh toán
-                  </span>
+                </p>
+
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Trạng thái thanh toán:</strong>{" "}
+                  {booking.paid ? (
+                    <span className="text-green-600 font-medium">
+                      Đã thanh toán
+                    </span>
+                  ) : (
+                    <span className="text-red-500 font-medium">
+                      Chưa thanh toán
+                    </span>
+                  )}
+                </p>
+
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Ngày đặt:</strong>{" "}
+                  {dayjs(booking.createdAt).format("HH:mm DD/MM/YYYY")}
+                </p>
+
+                {booking.tour?.description && (
+                  <p className="text-sm text-gray-500 mt-3">
+                    <strong>Mô tả:</strong> {booking.tour.description}
+                  </p>
                 )}
-              </p>
 
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Ngày đặt:</strong>{" "}
-                {dayjs(booking.createdAt).format("HH:mm DD/MM/YYYY")}
-              </p>
+                {/* --- Review Section --- */}
+                {isTourFinished && (
+                  <div className="mt-4">
+                    {activeReviewTourId === booking.tour._id ? (
+                      <div className="bg-gray-50 p-4 rounded-lg border mt-2">
+                        <label className="block text-sm font-medium mb-1">
+                          Đánh giá (1-5 sao):
+                        </label>
+                        <select
+                          value={reviewRating}
+                          onChange={(e) =>
+                            setReviewRating(Number(e.target.value))
+                          }
+                          className="border p-2 rounded w-full mb-3"
+                        >
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <option key={star} value={star}>
+                              {star} sao
+                            </option>
+                          ))}
+                        </select>
 
-              {booking.tour?.description && (
-                <p className="text-sm text-gray-500 mt-3">
-                  <strong>Mô tả:</strong> {booking.tour.description}
-                </p>
-              )}
+                        <textarea
+                          rows={3}
+                          className="border p-2 rounded w-full mb-3"
+                          placeholder="Viết cảm nhận của bạn về tour này..."
+                          value={reviewContent}
+                          onChange={(e) => setReviewContent(e.target.value)}
+                        />
 
-              {/* Nếu muốn hiển thị người dùng (admin xem được) */}
-              {booking.user?.name && (
-                <p className="text-sm text-gray-500 mt-2">
-                  <strong>Người đặt:</strong> {booking.user.name}
-                </p>
-              )}
+                        <div className="flex gap-2">
+                          <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            onClick={() => handleReviewSubmit(booking.tour._id)}
+                          >
+                            Gửi đánh giá
+                          </button>
+                          <button
+                            className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+                            onClick={() => setActiveReviewTourId(null)}
+                          >
+                            Hủy
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        className="mt-3 px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-700"
+                        onClick={() => setActiveReviewTourId(booking.tour._id)}
+                      >
+                        Viết đánh giá
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {successMessage && activeReviewTourId === null && (
+                  <p className="text-green-600 mt-2">{successMessage}</p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ import TourHeader from "../components/tour-detail/TourHeader";
 import TourInfo from "../components/tour-detail/TourInfo";
 import { TOUR_SAMPLE } from "../data/tour";
 import { getTourBySlug } from "../services/api";
+import TourReviews from "../components/tour-detail/TourReview";
 
 const TourDetailPage = () => {
   const { slug } = useParams();
@@ -71,6 +72,7 @@ const TourDetailPage = () => {
         locations={tour?.locations || TOUR_SAMPLE.locations}
         selectedLocation={selectedLocation}
       />
+      <TourReviews tourId={tour?._id} />
     </div>
   );
 };

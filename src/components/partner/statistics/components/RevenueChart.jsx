@@ -61,6 +61,7 @@ const RevenueChart = () => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="monthLabel" />
           <YAxis
+            width={100}
             tickFormatter={(value) =>
               value.toLocaleString("vi-VN", {
                 style: "currency",
