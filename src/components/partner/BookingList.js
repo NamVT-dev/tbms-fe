@@ -9,7 +9,7 @@ const BookingList = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await fetch("http://localhost:9999/bookings/partner", {
+        const response = await fetch("http://localhost:9999/bookings/partner/bookings", {
           method: "GET",
           credentials: "include",
         });
@@ -59,10 +59,10 @@ const BookingList = () => {
                     ? value === "pending"
                       ? "bg-yellow-500 text-white"
                       : value === "confirmed"
-                        ? "bg-green-600 text-white"
-                        : value === "cancelled"
-                          ? "bg-red-600 text-white"
-                          : "bg-gray-800 text-white"
+                      ? "bg-green-600 text-white"
+                      : value === "cancelled"
+                      ? "bg-red-600 text-white"
+                      : "bg-gray-800 text-white"
                     : "bg-gray-200 text-gray-800"
                 }`}
                 onClick={() => setFilterStatus(value)}
@@ -77,21 +77,24 @@ const BookingList = () => {
               <thead className="bg-indigo-600 text-white">
                 <tr>
                   <th className="px-3 py-2">STT</th>
-                  <th className="px-3 py-2">Khách hàng</th>
-                  <th className="px-3 py-2">Email</th>
+                  <th className="px-3 py-2">Tên Khách Hàng</th>
                   <th className="px-3 py-2">Tên Tour</th>
+                  <th className="px-3 py-2">Mô tả</th>
+                  <th className="px-3 py-2">Số lượng</th>
                   <th className="px-3 py-2">Giá</th>
                   <th className="px-3 py-2">Ngày đặt</th>
-                  <th className="px-3 py-2">Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredBookings.map((booking, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
                     <td className="px-3 py-2">{index + 1}</td>
-                    <td>{booking.customer?.name || "-"}</td>
-                    <td>{booking.customer?.email || "-"}</td>
+                    <td>{booking.user?.name || "-"}</td>
                     <td>{booking.tour?.name || "-"}</td>
+                    <td className="text-left px-2 max-w-xs truncate">
+                      {booking.tour?.summary || "Không có mô tả"}
+                    </td>
+                    <td>{booking.numberOfPeople || "-"}</td>
                     <td className="text-green-700 font-medium">
                       {booking.price?.toLocaleString("vi-VN", {
                         style: "currency",
@@ -99,26 +102,9 @@ const BookingList = () => {
                       }) || "0 VND"}
                     </td>
                     <td>
-                      {booking.bookedAt
-                        ? new Date(booking.bookedAt).toLocaleDateString()
+                      {booking.createdAt
+                        ? new Date(booking.createdAt).toLocaleDateString("vi-VN")
                         : "-"}
-                    </td>
-                    <td>
-                      <span
-                        className={`px-2 py-1 rounded-md text-white text-xs font-medium ${
-                          booking.status === "confirmed"
-                            ? "bg-green-600"
-                            : booking.status === "pending"
-                              ? "bg-yellow-500"
-                              : "bg-red-600"
-                        }`}
-                      >
-                        {booking.status === "confirmed"
-                          ? "Đã xác nhận"
-                          : booking.status === "pending"
-                            ? "Chờ duyệt"
-                            : "Đã hủy"}
-                      </span>
                     </td>
                   </tr>
                 ))}

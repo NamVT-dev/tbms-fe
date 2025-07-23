@@ -18,6 +18,32 @@ const EditTour = () => {
 
   const navigate = useNavigate();
 
+  // Validate Form
+  const validateForm = () => {
+    const {
+      name,
+      duration,
+      maxGroupSize,
+      price,
+      priceDiscount,
+      summary,
+      description,
+    } = formData;
+
+    if (!name.trim()) return "Tên tour không được để trống";
+    if (!duration || duration <= 0)
+      return "Thời gian tour phải lớn hơn 0";
+    if (!maxGroupSize || maxGroupSize <= 0)
+      return "Số lượng khách tối đa phải lớn hơn 0";
+    if (!price || price <= 0) return "Giá tour phải lớn hơn 0";
+    if (priceDiscount < 0 || priceDiscount > price)
+      return "Giảm giá phải từ 0 và không lớn hơn giá gốc";
+    if (!summary.trim()) return "Tóm tắt tour không được để trống";
+    if (!description.trim()) return "Mô tả chi tiết không được để trống";
+
+    return null;
+  };
+
   useEffect(() => {
     const fetchTourDetails = async () => {
       try {
@@ -47,6 +73,13 @@ const EditTour = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const error = validateForm();
+    if (error) {
+      alert(error);
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
         method: "PATCH",

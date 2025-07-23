@@ -4,7 +4,8 @@ import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
 
-import "react-multi-date-picker/styles/layouts/prime.css"; // theme đẹp hơn
+
+import "react-multi-date-picker/styles/layouts/prime.css";
 
 const CreateTour = () => {
   const [formData, setFormData] = useState({
@@ -25,17 +26,46 @@ const CreateTour = () => {
     status: "pending",
   });
 
-  const [finalPrice, setFinalPrice] = useState(0);
   const [coverFile, setCoverFile] = useState(null);
   const [imageFiles, setImageFiles] = useState([]);
   const [dates, setDates] = useState([]);
+  const [finalPrice, setFinalPrice] = useState(0);
+
   const navigate = useNavigate();
+
+
+  const validateForm = () => {
+    const {
+      name,
+      duration,
+      maxGroupSize,
+      price,
+      priceDiscount,
+      summary,
+      description,
+      startLocation,
+    } = formData;
+
+    if (!name.trim()) return "Tên tour không được để trống";
+    if (duration <= 0) return "Thời gian phải lớn hơn 0";
+    if (maxGroupSize <= 0) return "Số lượng tối đa phải lớn hơn 0";
+    if (price <= 0) return "Giá phải lớn hơn 0";
+    if (priceDiscount < 0 || priceDiscount > 100)
+      return "Giảm giá phải từ 0 đến 100%";
+    if (!summary.trim()) return "Vui lòng nhập tóm tắt tour";
+    if (!description.trim()) return "Vui lòng nhập mô tả tour";
+    if (!coverFile) return "Vui lòng chọn ảnh bìa";
+    if (dates.length === 0) return "Vui lòng chọn ít nhất một ngày khởi hành";
+    if (!startLocation.address.trim())
+      return "Vui lòng chọn địa điểm xuất phát";
+    return null;
+  };
 
   useEffect(() => {
     const price = parseFloat(formData.price) || 0;
     const discount = parseFloat(formData.priceDiscount) || 0;
-    const discountedPrice = price - (price * discount) / 100;
-    setFinalPrice(discountedPrice > 0 ? discountedPrice : 0);
+    const discounted = price - (price * discount) / 100;
+    setFinalPrice(discounted > 0 ? discounted : 0);
   }, [formData.price, formData.priceDiscount]);
 
   const handleChange = (e) => {
@@ -53,47 +83,46 @@ const CreateTour = () => {
     }
   };
 
-  const uploadImages = async () => {
-    const form = new FormData();
-    imageFiles.forEach((img) => form.append("images", img));
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls || [];
-  };
-
-  const uploadCover = async () => {
-    if (!coverFile) return null;
-    const form = new FormData();
-    form.append("images", coverFile);
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls?.[0] || null;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const imageCoverUrl = await uploadCover();
-      const otherImageUrls = await uploadImages();
 
-      const payload = {
-        ...formData,
-        imageCover: imageCoverUrl,
-        images: otherImageUrls,
-        startDates: dates.map((d) => d.toDate()),
-      };
+    const error = validateForm();
+    if (error) {
+      alert(error);
+      return;
+    }
+
+    try {
+      const form = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (
+          key !== "startLocation" &&
+          key !== "imageCover" &&
+          key !== "images" &&
+          key !== "startDates"
+        ) {
+          form.append(key, value);
+        }
+      });
+
+      form.append("startLocation[address]", formData.startLocation.address);
+      form.append(
+        "startLocation[description]",
+        formData.startLocation.description
+      );
+
+      dates.forEach((date, index) => {
+        form.append(`startDates[${index}]`, date.toDate().toISOString());
+      });
+
+      if (coverFile) form.append("imageCover", coverFile);
+      imageFiles.forEach((file) => form.append("images", file));
 
       const res = await fetch("http://localhost:9999/tours/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: form,
       });
 
       const data = await res.json();
@@ -104,7 +133,7 @@ const CreateTour = () => {
         alert(data.message || "Lỗi tạo tour");
       }
     } catch (error) {
-      console.error("Lỗi:", error);
+      console.error("Lỗi gửi form:", error);
     }
   };
 
@@ -113,7 +142,6 @@ const CreateTour = () => {
       <div className="w-64 bg-gray-900 text-white">
         <Sidebar />
       </div>
-
       <div className="flex-1">
         <Header />
         <div className="p-10">
@@ -135,16 +163,16 @@ const CreateTour = () => {
               <input
                 type="number"
                 name="duration"
-                placeholder="Thời gian (số ngày)"
+                placeholder="Thời gian (ngày)"
                 onChange={handleChange}
-                required
                 className={inputClass}
+                required
               />
               <input
-                name="maxGroupSize"
-                onChange={handleChange}
                 type="number"
+                name="maxGroupSize"
                 placeholder="Số lượng tối đa"
+                onChange={handleChange}
                 className={inputClass}
                 required
               />
@@ -163,7 +191,6 @@ const CreateTour = () => {
                 placeholder="Giảm giá (%)"
                 className={inputClass}
               />
-
               <input
                 name="address"
                 onChange={handleChange}
@@ -176,14 +203,29 @@ const CreateTour = () => {
                 placeholder="Mô tả địa điểm xuất phát"
                 className={inputClass}
               />
-
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh bìa</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setCoverFile(e.target.files[0])}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    setCoverFile(file);
+                    if (file) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        imageCover: URL.createObjectURL(file),
+                      }));
+                    }
+                  }}
                 />
+                {formData.imageCover && (
+                  <img
+                    src={formData.imageCover}
+                    alt="Ảnh bìa preview"
+                    className="w-48 h-32 object-cover rounded-lg shadow-md mt-2"
+                  />
+                )}
               </div>
 
               <div className="flex flex-col">
@@ -192,10 +234,32 @@ const CreateTour = () => {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setImageFiles(Array.from(e.target.files))}
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    setImageFiles(files);
+                    const previews = files.map((file) => URL.createObjectURL(file));
+                    setFormData((prev) => ({
+                      ...prev,
+                      images: previews,
+                    }));
+                  }}
                 />
+                {formData.images.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    {formData.images.map((img, i) => (
+                      <img
+                        key={i}
+                        src={img}
+                        alt={`Ảnh phụ ${i + 1}`}
+                        className="w-24 h-20 object-cover rounded-lg shadow"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
 
+              <div className="flex flex-col">
+              </div>
               <textarea
                 name="summary"
                 onChange={handleChange}
@@ -210,20 +274,22 @@ const CreateTour = () => {
                 className={`${textareaClass} md:col-span-2`}
                 required
               />
-
               <div className="md:col-span-2">
                 <label className="text-sm text-gray-600 mb-2 block">
-                  Ngày khởi hành (có thể chọn nhiều)
+                  Ngày khởi hành
                 </label>
                 <div className="bg-white p-4 rounded-xl shadow w-fit">
                   <DatePicker
+                    open={true}
                     value={dates}
                     onChange={setDates}
-                    onlyCalendar
                     multiple
                     format="YYYY-MM-DD"
+                    calendarPosition="bottom-center"
                     className="rmdp-prime custom-calendar"
+                    style={{ padding: "12px", borderRadius: "10px", border: "1px solid #ccc", fontSize: "16px" }}
                   />
+
                 </div>
               </div>
 
@@ -231,7 +297,6 @@ const CreateTour = () => {
                 💸 Giá sau giảm:{" "}
                 <strong>{finalPrice.toLocaleString()} VND</strong>
               </div>
-
               <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-4">
                 <button
                   type="submit"
@@ -262,11 +327,7 @@ const inputClass =
 const textareaClass =
   "w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm min-h-[120px]";
 
-// Thêm CSS để ẩn input ẩn của react-multi-date-picker
-const style = document.createElement("style");
-style.innerHTML = `
-  .custom-calendar input.rmdp-input {
-    display: none !important;
-  }
-`;
-document.head.appendChild(style);
+// // Ẩn input trong date picker
+// const style = document.createElement("style");
+// style.innerHTML = `.custom-calendar input.rmdp-input { display: none !important; }`;
+// document.head.appendChild(style);
