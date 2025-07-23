@@ -6,7 +6,7 @@ const HeroSection = () => {
   const [keyword, setKeyword] = useState("");
   const [price, setPrice] = useState("");
   const [ratingsAverage, setRatingsAverage] = useState("");
-  const [setIsSearched] = useState(false);
+  const [isSearched, setIsSearched] = useState(false);
 
   const handleSearch = () => {
     const [minPrice, maxPrice] = price ? price.split("-") : [null, null];
