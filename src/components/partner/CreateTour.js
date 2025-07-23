@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
-
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css";
 
 const CreateTour = () => {
@@ -16,7 +17,7 @@ const CreateTour = () => {
     priceDiscount: "",
     summary: "",
     description: "",
-    imageCover: "",
+    imageCover: null,
     images: [],
     startLocation: {
       address: "",
@@ -26,46 +27,15 @@ const CreateTour = () => {
     status: "pending",
   });
 
-  const [coverFile, setCoverFile] = useState(null);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [dates, setDates] = useState([]);
   const [finalPrice, setFinalPrice] = useState(0);
-
+  const [dates, setDates] = useState([]);
   const navigate = useNavigate();
-
-
-  const validateForm = () => {
-    const {
-      name,
-      duration,
-      maxGroupSize,
-      price,
-      priceDiscount,
-      summary,
-      description,
-      startLocation,
-    } = formData;
-
-    if (!name.trim()) return "Tên tour không được để trống";
-    if (duration <= 0) return "Thời gian phải lớn hơn 0";
-    if (maxGroupSize <= 0) return "Số lượng tối đa phải lớn hơn 0";
-    if (price <= 0) return "Giá phải lớn hơn 0";
-    if (priceDiscount < 0 || priceDiscount > 100)
-      return "Giảm giá phải từ 0 đến 100%";
-    if (!summary.trim()) return "Vui lòng nhập tóm tắt tour";
-    if (!description.trim()) return "Vui lòng nhập mô tả tour";
-    if (!coverFile) return "Vui lòng chọn ảnh bìa";
-    if (dates.length === 0) return "Vui lòng chọn ít nhất một ngày khởi hành";
-    if (!startLocation.address.trim())
-      return "Vui lòng chọn địa điểm xuất phát";
-    return null;
-  };
 
   useEffect(() => {
     const price = parseFloat(formData.price) || 0;
     const discount = parseFloat(formData.priceDiscount) || 0;
-    const discounted = price - (price * discount) / 100;
-    setFinalPrice(discounted > 0 ? discounted : 0);
+    const discountedPrice = price - (price * discount) / 100;
+    setFinalPrice(discountedPrice > 0 ? discountedPrice : 0);
   }, [formData.price, formData.priceDiscount]);
 
   const handleChange = (e) => {
@@ -83,6 +53,36 @@ const CreateTour = () => {
     }
   };
 
+  const validateForm = () => {
+    const {
+      name,
+      duration,
+      maxGroupSize,
+      price,
+      priceDiscount,
+      summary,
+      description,
+      imageCover,
+      startLocation,
+    } = formData;
+
+    if (!name.trim()) return "Tên tour không được để trống";
+    if (duration <= 0) return "Thời gian phải lớn hơn 0";
+    if (maxGroupSize <= 0) return "Số lượng tối đa phải lớn hơn 0";
+    if (price <= 0) return "Giá phải lớn hơn 0";
+    if (priceDiscount < 0 || priceDiscount > 100)
+      return "Giảm giá phải từ 0 đến 100%";
+    if (!summary.trim()) return "Vui lòng nhập tóm tắt tour";
+    if (!description || description === "<p><br></p>")
+      return "Vui lòng nhập mô tả tour";
+    if (!imageCover) return "Vui lòng chọn ảnh bìa";
+    if (dates.length === 0) return "Vui lòng chọn ít nhất một ngày khởi hành";
+    if (!startLocation.address.trim())
+      return "Vui lòng nhập địa chỉ xuất phát";
+
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -92,38 +92,36 @@ const CreateTour = () => {
       return;
     }
 
+    const form = new FormData();
     try {
-      const form = new FormData();
-
-      Object.entries(formData).forEach(([key, value]) => {
-        if (
-          key !== "startLocation" &&
-          key !== "imageCover" &&
-          key !== "images" &&
-          key !== "startDates"
-        ) {
-          form.append(key, value);
-        }
-      });
-
+      form.append("name", formData.name);
+      form.append("duration", formData.duration);
+      form.append("maxGroupSize", formData.maxGroupSize);
+      form.append("price", formData.price);
+      form.append("priceDiscount", formData.priceDiscount);
+      form.append("summary", formData.summary);
+      form.append("description", formData.description);
+      form.append("imageCover", formData.imageCover);
       form.append("startLocation[address]", formData.startLocation.address);
       form.append(
         "startLocation[description]",
         formData.startLocation.description
       );
 
-      dates.forEach((date, index) => {
-        form.append(`startDates[${index}]`, date.toDate().toISOString());
-      });
+      for (let i = 0; i < formData.images.length; i++) {
+        form.append("images", formData.images[i]);
+      }
 
-      if (coverFile) form.append("imageCover", coverFile);
-      imageFiles.forEach((file) => form.append("images", file));
+      dates.forEach((date) => form.append("startDates", date));
 
-      const res = await fetch("http://localhost:9999/tours/create", {
-        method: "POST",
-        credentials: "include",
-        body: form,
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}tours/create`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: form,
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -133,7 +131,7 @@ const CreateTour = () => {
         alert(data.message || "Lỗi tạo tour");
       }
     } catch (error) {
-      console.error("Lỗi gửi form:", error);
+      console.error("Lỗi:", error);
     }
   };
 
@@ -142,6 +140,7 @@ const CreateTour = () => {
       <div className="w-64 bg-gray-900 text-white">
         <Sidebar />
       </div>
+
       <div className="flex-1">
         <Header />
         <div className="p-10">
@@ -163,16 +162,16 @@ const CreateTour = () => {
               <input
                 type="number"
                 name="duration"
-                placeholder="Thời gian (ngày)"
+                placeholder="Thời gian (số ngày)"
                 onChange={handleChange}
-                className={inputClass}
                 required
+                className={inputClass}
               />
               <input
-                type="number"
                 name="maxGroupSize"
-                placeholder="Số lượng tối đa"
                 onChange={handleChange}
+                type="number"
+                placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
                 required
               />
@@ -191,6 +190,7 @@ const CreateTour = () => {
                 placeholder="Giảm giá (%)"
                 className={inputClass}
               />
+
               <input
                 name="address"
                 onChange={handleChange}
@@ -203,62 +203,36 @@ const CreateTour = () => {
                 placeholder="Mô tả địa điểm xuất phát"
                 className={inputClass}
               />
-             <div className="flex flex-col">
+
+              <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh bìa</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0];
-                    setCoverFile(file);
-                    if (file) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        imageCover: URL.createObjectURL(file),
-                      }));
-                    }
-                  }}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageCover: e.target.files[0],
+                    }))
+                  }
                 />
-                {formData.imageCover && (
-                  <img
-                    src={formData.imageCover}
-                    alt="Ảnh bìa preview"
-                    className="w-48 h-32 object-cover rounded-lg shadow-md mt-2"
-                  />
-                )}
               </div>
 
-                     <div className="flex flex-col">
+              <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh phụ (nhiều)</label>
                 <input
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files);
-                    setImageFiles(files);
-                    const previews = files.map((file) => URL.createObjectURL(file));
+                  onChange={(e) =>
                     setFormData((prev) => ({
                       ...prev,
-                      images: previews,
-                    }));
-                  }}
+                      images: e.target.files,
+                    }))
+                  }
                 />
-                {formData.images.length > 0 && (
-                  <div className="flex flex-wrap gap-3 mt-2">
-                    {formData.images.map((img, i) => (
-                      <img
-                        key={i}
-                        src={img}
-                        alt={`Ảnh phụ ${i + 1}`}
-                        className="w-24 h-20 object-cover rounded-lg shadow"
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
 
-             
               <textarea
                 name="summary"
                 onChange={handleChange}
@@ -266,29 +240,31 @@ const CreateTour = () => {
                 className={`${textareaClass} md:col-span-2`}
                 required
               />
-              <textarea
-                name="description"
-                onChange={handleChange}
-                placeholder="Mô tả chi tiết"
-                className={`${textareaClass} md:col-span-2`}
-                required
+              <ReactQuill
+                className="md:col-span-2 mb-20"
+                theme="snow"
+                value={formData.description}
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: value,
+                  }))
+                }
               />
+
               <div className="md:col-span-2">
                 <label className="text-sm text-gray-600 mb-2 block">
-                  Ngày khởi hành
+                  Ngày khởi hành (có thể chọn nhiều)
                 </label>
                 <div className="bg-white p-4 rounded-xl shadow w-fit">
                   <DatePicker
-                    open={true}
                     value={dates}
                     onChange={setDates}
+                    onlyCalendar
                     multiple
                     format="YYYY-MM-DD"
-                    calendarPosition="bottom-center"
                     className="rmdp-prime custom-calendar"
-                    style={{ padding: "12px", borderRadius: "10px", border: "1px solid #ccc", fontSize: "16px" }}
                   />
-
                 </div>
               </div>
 
@@ -296,6 +272,7 @@ const CreateTour = () => {
                 💸 Giá sau giảm:{" "}
                 <strong>{finalPrice.toLocaleString()} VND</strong>
               </div>
+
               <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-4">
                 <button
                   type="submit"
@@ -326,4 +303,10 @@ const inputClass =
 const textareaClass =
   "w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm min-h-[120px]";
 
-
+const style = document.createElement("style");
+style.innerHTML = `
+  .custom-calendar input.rmdp-input {
+    display: none !important;
+  }
+`;
+document.head.appendChild(style);
