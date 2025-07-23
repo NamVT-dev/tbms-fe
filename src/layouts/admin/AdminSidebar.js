@@ -14,17 +14,8 @@ import { authService } from "../../services/api";
 
 const navigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: HomeIcon },
-  {
-    name: "Partner Dashboard",
-    href: "/admin/partner-dashboard",
-    icon: HomeIcon,
-  },
   { name: "Manage Users", href: "/admin/users", icon: UserGroupIcon },
   { name: "Pending Tours", href: "/admin/pending-tours", icon: ClockIcon },
-  { name: "Calendar", href: "/admin/calendar", icon: CalendarIcon },
-  { name: "Chat", href: "/admin/chat", icon: ChatBubbleLeftIcon },
-  { name: "Statistics", href: "/admin/statistics", icon: ChartBarIcon },
-  { name: "Settings", href: "/admin/settings", icon: Cog6ToothIcon },
 ];
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen }) => {
