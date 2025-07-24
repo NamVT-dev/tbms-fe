@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   HomeIcon,
   PlusCircleIcon,
@@ -8,49 +8,41 @@ import {
   ArrowRightOnRectangleIcon,
   ChartBarIcon,
 } from "@heroicons/react/24/outline";
+import { authService } from "../../services/api"; // dùng giống admin
 
 const navigation = [
   { name: "Dashboard", href: "/partner/dashboard", icon: HomeIcon },
-  {
-    name: "Thống kê",
-    href: "/partner/statistics",
-    icon: ChartBarIcon,
-  },
-  {
-    name: "Tạo Tour mới",
-    href: "/partner/tours/create",
-    icon: PlusCircleIcon,
-  },
-  {
-    name: "Danh sách Tour",
-    href: "/partner/tours",
-    icon: ClipboardDocumentListIcon,
-  },
-  {
-    name: "Đơn đặt Tour",
-    href: "/partner/tours/bookinglist",
-    icon: CalendarDaysIcon,
-  },
-  {
-    name: "Hồ sơ Công Ty",
-    href: "/partner/profile",
-    icon: ClipboardDocumentListIcon,
-  },
+  { name: "Thống kê", href: "/partner/statistics", icon: ChartBarIcon },
+  { name: "Tạo Tour mới", href: "/partner/tours/create", icon: PlusCircleIcon },
+  { name: "Danh sách Tour", href: "/partner/tours", icon: ClipboardDocumentListIcon },
+  { name: "Đơn đặt Tour", href: "/partner/tours/bookinglist", icon: CalendarDaysIcon },
+  { name: "Hồ sơ Công Ty", href: "/partner/profile", icon: ClipboardDocumentListIcon },
 ];
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout(); // gọi API logout
+      navigate("/login"); // chuyển hướng về login
+    } catch (error) {
+      console.error("Logout failed:", error);
+      navigate("/login"); // fallback nếu lỗi
+    }
+  };
 
   return (
     <aside
       className={`
-                ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-                fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
-                transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-                flex flex-col h-full
-            `}
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200
+        transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
+        flex flex-col h-full
+      `}
     >
-      {/* Logo và nút đóng sidebar */}
+      {/* Logo + Close button */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
         <Link
           to="/partner/dashboard"
@@ -75,7 +67,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         </button>
       </div>
 
-      {/* Menu điều hướng */}
+      {/* Navigation */}
       <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href;
@@ -84,13 +76,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               key={item.name}
               to={item.href}
               className={`
-                                flex items-center px-4 py-2 text-sm font-medium rounded-lg
-                                ${
-                                  isActive
-                                    ? "bg-indigo-50 text-indigo-600"
-                                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                                }
-                            `}
+                flex items-center px-4 py-2 text-sm font-medium rounded-lg
+                ${isActive
+                  ? "bg-indigo-50 text-indigo-600"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}
+              `}
             >
               <item.icon
                 className={`w-5 h-5 mr-3 ${
@@ -101,19 +91,18 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             </Link>
           );
         })}
-
-        {/* Đăng xuất */}
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/";
-          }}
-          className="flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 rounded-lg mt-4"
-        >
-          <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3 text-red-500" />
-          Đăng Xuất
-        </button>
       </nav>
+
+      {/* Logout */}
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="flex items-center w-full px-4 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-colors duration-200"
+        >
+          <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
+          Đăng xuất
+        </button>
+      </div>
     </aside>
   );
 };

@@ -9,7 +9,7 @@ const BookingList = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const response = await fetch("http://localhost:9999/bookings/partner/bookings", {
+        const response = await fetch("http://localhost:9999/bookings/partner", {
           method: "GET",
           credentials: "include",
         });
@@ -48,9 +48,7 @@ const BookingList = () => {
           <div className="flex justify-center flex-wrap gap-2 mb-6">
             {[
               { label: "Tất cả", value: "all" },
-              { label: "Chờ duyệt", value: "pending" },
-              { label: "Đã xác nhận", value: "confirmed" },
-              { label: "Đã hủy", value: "cancelled" },
+             
             ].map(({ label, value }) => (
               <button
                 key={value}
@@ -83,6 +81,7 @@ const BookingList = () => {
                   <th className="px-3 py-2">Số lượng</th>
                   <th className="px-3 py-2">Giá</th>
                   <th className="px-3 py-2">Ngày đặt</th>
+                  <th className="px-3 py-2">Trạng Thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +89,7 @@ const BookingList = () => {
                   <tr key={index} className="border-b hover:bg-gray-50">
                     <td className="px-3 py-2">{index + 1}</td>
                     <td>{booking.user?.name || "-"}</td>
-                    <td>{booking.tour?.name || "-"}</td>
+                    <td className="font-semibold text-blue-800">{booking.tour?.name || "-"}</td>
                     <td className="text-left px-2 max-w-xs truncate">
                       {booking.tour?.summary || "Không có mô tả"}
                     </td>
@@ -106,6 +105,7 @@ const BookingList = () => {
                         ? new Date(booking.createdAt).toLocaleDateString("vi-VN")
                         : "-"}
                     </td>
+                    <td>{booking.tour?.status || "-"}</td>
                   </tr>
                 ))}
                 {filteredBookings.length === 0 && (

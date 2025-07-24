@@ -4,6 +4,8 @@ import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
 import ReactQuill from "react-quill";
+import { FaFileImage } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 
 import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css";
@@ -29,6 +31,10 @@ const CreateTour = () => {
 
   const [finalPrice, setFinalPrice] = useState(0);
   const [dates, setDates] = useState([]);
+  const [preview, setPreview] = useState({
+    imageCover: null,
+    images: [],
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,7 +58,11 @@ const CreateTour = () => {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-
+  const isQuillContentEmpty = (html) => {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.textContent.trim() === "";
+  };
   const validateForm = () => {
     const {
       name,
@@ -72,9 +82,8 @@ const CreateTour = () => {
     if (price <= 0) return "Giá phải lớn hơn 0";
     if (priceDiscount < 0 || priceDiscount > 100)
       return "Giảm giá phải từ 0 đến 100%";
-    if (!summary.trim()) return "Vui lòng nhập tóm tắt tour";
-    if (!description || description === "<p><br></p>")
-      return "Vui lòng nhập mô tả tour";
+    if (isQuillContentEmpty(summary)) return "Vui lòng nhập tóm tắt tour";
+    if (isQuillContentEmpty(description)) return "Vui lòng nhập mô tả tour";
     if (!imageCover) return "Vui lòng chọn ảnh bìa";
     if (dates.length === 0) return "Vui lòng chọn ít nhất một ngày khởi hành";
     if (!startLocation.address.trim())
@@ -94,9 +103,9 @@ const CreateTour = () => {
 
     const form = new FormData();
     form.append("name", formData.name);
-    form.append("duration", formData.duration);
-    form.append("maxGroupSize", formData.maxGroupSize);
-    form.append("price", formData.price);
+    form.append("duration", parseInt(formData.duration, 10));
+    form.append("maxGroupSize", parseInt(formData.maxGroupSize, 10));
+    form.append("price", parseFloat(formData.price));
     form.append("priceDiscount", formData.priceDiscount);
     form.append("summary", formData.summary);
     form.append("description", formData.description);
@@ -146,7 +155,7 @@ const CreateTour = () => {
         <div className="p-10">
           <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-xl">
             <h2 className="text-3xl font-bold text-center text-indigo-600 mb-8">
-              ✨ Tạo Tour Mới
+              Tạo Tour Mới
             </h2>
             <form
               onSubmit={handleSubmit}
@@ -173,7 +182,7 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
-                min="1"
+                min="0"
                 required
               />
               <input
@@ -201,53 +210,112 @@ const CreateTour = () => {
                 className={inputClass}
                 required
               />
-              <input
+              {/* <input
                 name="descriptionStart"
                 onChange={handleChange}
-                placeholder="Mô tả địa điểm xuất phát"
+                placeholder="Mô tả địa chỉ xuất phát"
                 className={inputClass}
-              />
+              /> */}
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Ảnh bìa */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Ảnh bìa</label>
+                  <div
+                    className="border rounded-lg p-2 text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    onClick={() => document.getElementById("imageCoverInput").click()}
+                  >
+                    {preview.imageCover ? (
+                      <img
+                        src={preview.imageCover}
+                        alt="Ảnh bìa preview"
+                        className="h-32 mx-auto object-cover"
+                      />
+                    ) : (
+                      <FaFileImage className="mx-auto text-gray-400 text-3xl" />
+                    )}
+                    <div>Bấm vào đây để tải ảnh</div>
+                  </div>
+                  <input
+                    type="file"
+                    id="imageCoverInput"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setFormData((prev) => ({ ...prev, imageCover: file }));
+                        setPreview((prev) => ({
+                          ...prev,
+                          imageCover: URL.createObjectURL(file),
+                        }));
+                      }
+                    }}
+                    required
+                  />
+                </div>
 
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600">Ảnh bìa</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      imageCover: e.target.files[0],
-                    }))
-                  }
-                  required
-                />
+                {/* Ảnh phụ */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium">Ảnh phụ</label>
+                  <div
+                    className="border rounded-lg p-2 text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    onClick={() => document.getElementById("imagesInput").click()}
+                  >
+                    {preview.images.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        {preview.images.map((src, idx) => (
+                          <img
+                            key={idx}
+                            src={src}
+                            alt={`Ảnh phụ ${idx + 1}`}
+                            className="h-32 w-full object-cover rounded"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <>
+                        <FaFileImage className="mx-auto text-gray-400 text-3xl" />
+                        <div>Bấm vào đây để tải ảnh phụ</div>
+                      </>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    id="imagesInput"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      if (files.length > 0) {
+                        setFormData((prev) => ({ ...prev, images: files }));
+                        setPreview((prev) => ({
+                          ...prev,
+                          images: files.map((f) => URL.createObjectURL(f)),
+                        }));
+                      }
+                    }}
+                  />
+                </div>
               </div>
 
-              <div className="flex flex-col">
-                <label className="text-sm text-gray-600">Ảnh phụ (nhiều)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      images: e.target.files,
-                    }))
-                  }
-                />
-              </div>
-
-              <textarea
-                name="summary"
-                onChange={handleChange}
-                placeholder="Tóm tắt tour"
-                className={`${textareaClass} md:col-span-2`}
-                required
-              />
               <ReactQuill
                 className="md:col-span-2 mb-20"
                 theme="snow"
+                placeholder="Tóm tắt tour"
+                value={formData.summary}
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    summary: value,
+                  }))
+                }
+              />
+
+              <ReactQuill
+                className="md:col-span-2 mb-20"
+                theme="snow"
+                placeholder="Mô tả chi tiết tour"
                 value={formData.description}
                 onChange={(value) =>
                   setFormData((prev) => ({
@@ -261,16 +329,33 @@ const CreateTour = () => {
                 <label className="text-sm text-gray-600 mb-2 block">
                   Ngày khởi hành (có thể chọn nhiều)
                 </label>
-                <div className="bg-white p-4 rounded-xl shadow w-fit">
-                  <DatePicker
-                    value={dates}
-                    onChange={setDates}
-                    onlyCalendar
-                    multiple
-                    format="YYYY-MM-DD"
-                    className="rmdp-prime custom-calendar"
-                  />
+                <div className="md:col-span-2">
+
+                  <div className="relative">
+                    <DatePicker
+                      value={dates}
+                      onChange={(newDates) => {
+                        const tomorrow = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1);
+
+                        const validDates = newDates.filter(date => new Date(date) >= tomorrow);
+
+                        setDates(validDates);
+                      }}
+                      onlyCalendar
+                      multiple
+                      format="YYYY-MM-DD"
+                      minDate={new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1)}
+                      className="w-full"
+                      containerClassName="w-full"
+                      inputClass="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm pl-12"
+                      placeholder="Chọn ngày khởi hành"
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                      <FaRegCalendarAlt />
+                    </div>
+                  </div>
                 </div>
+
               </div>
 
               <div className="md:col-span-2 text-right text-indigo-700 font-medium">
@@ -283,7 +368,7 @@ const CreateTour = () => {
                   type="submit"
                   className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700"
                 >
-                  🚀 Tạo Tour
+                  Tạo Tour
                 </button>
                 <button
                   type="button"

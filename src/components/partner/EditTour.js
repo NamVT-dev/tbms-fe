@@ -18,7 +18,7 @@ const EditTour = () => {
 
   const navigate = useNavigate();
 
-  // Validate Form
+  
   const validateForm = () => {
     const {
       name,
@@ -81,7 +81,7 @@ const EditTour = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:9999/tours/${id}`, {
+      const response = await fetch(`http://localhost:9999/tours/update/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -165,20 +165,19 @@ const EditTour = () => {
           />
         </div>
 
-        {/* Trạng thái Tour */}
+        {/* Địa điểm xuất phát */}
         <div>
-          <label className="text-gray-700 font-semibold">Trạng thái Tour</label>
-          <select
-            name="status"
-            value={formData.status}
+          <label className="text-gray-700 font-semibold">Địa điểm xuất phát</label>
+          <input
+            type="text"
+            name="startLocation"
+            value={formData.startLocation?.address || ""}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="pending">Chờ duyệt</option>
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Không hoạt động</option>
-          </select>
+            required
+          />
         </div>
+
 
         {/* Giá */}
         <div>
