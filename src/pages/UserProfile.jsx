@@ -73,9 +73,6 @@ const UserProfile = () => {
         <nav className="flex-[0_0_32rem] bg-gradient-to-br from-[#77dada] to-[#0b7070] py-16">
           <ul className="list-none">
             <NavItem link="#" text="Cài Đặt" icon="settings" active={true} />
-            <NavItem link="#" text="Tour Của Tôi" icon="briefcase" />
-            <NavItem link="#" text="Đánh Giá" icon="star" />
-            <NavItem link="#" text="Lịch Sử Thanh Toán" icon="credit-card" />
           </ul>
         </nav>
         <div className="flex-1 py-28">

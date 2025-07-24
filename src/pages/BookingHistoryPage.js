@@ -9,6 +9,7 @@ const BookingHistoryPage = () => {
   const [reviewContent, setReviewContent] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
   const [successMessage, setSuccessMessage] = useState("");
+  const [successReviewTourIds, setSuccessReviewTourIds] = useState({});
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -34,13 +35,13 @@ const BookingHistoryPage = () => {
         `${process.env.REACT_APP_BACKEND_URL}reviews`,
         {
           tourId,
-          review: reviewContent,
+          review: reviewContent || "",
           rating: reviewRating,
         },
         { withCredentials: true }
       );
 
-      setSuccessMessage("Đã gửi đánh giá thành công.");
+      setSuccessReviewTourIds((prev) => ({ ...prev, [tourId]: true }));
       setActiveReviewTourId(null);
       setReviewContent("");
       setReviewRating(5);
@@ -102,26 +103,13 @@ const BookingHistoryPage = () => {
                 </p>
 
                 <p className="text-sm text-gray-600 mt-1">
-                  <strong>Trạng thái thanh toán:</strong>{" "}
-                  {booking.paid ? (
-                    <span className="text-green-600 font-medium">
-                      Đã thanh toán
-                    </span>
-                  ) : (
-                    <span className="text-red-500 font-medium">
-                      Chưa thanh toán
-                    </span>
-                  )}
-                </p>
-
-                <p className="text-sm text-gray-600 mt-1">
                   <strong>Ngày đặt:</strong>{" "}
                   {dayjs(booking.createdAt).format("HH:mm DD/MM/YYYY")}
                 </p>
 
                 {booking.tour?.description && (
                   <p className="text-sm text-gray-500 mt-3">
-                    <strong>Mô tả:</strong> {booking.tour.description}
+                    <strong>Mô tả:</strong> {booking.tour.summary}
                   </p>
                 )}
 
@@ -181,8 +169,10 @@ const BookingHistoryPage = () => {
                   </div>
                 )}
 
-                {successMessage && activeReviewTourId === null && (
-                  <p className="text-green-600 mt-2">{successMessage}</p>
+                {successReviewTourIds[booking.tour._id] && (
+                  <p className="text-green-600 mt-2">
+                    Đã gửi đánh giá thành công.
+                  </p>
                 )}
               </div>
             </div>

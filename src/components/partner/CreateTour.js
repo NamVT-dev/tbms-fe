@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
 import ReactQuill from "react-quill";
+
 import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css";
 
@@ -93,27 +93,27 @@ const CreateTour = () => {
     }
 
     const form = new FormData();
+    form.append("name", formData.name);
+    form.append("duration", formData.duration);
+    form.append("maxGroupSize", formData.maxGroupSize);
+    form.append("price", formData.price);
+    form.append("priceDiscount", formData.priceDiscount);
+    form.append("summary", formData.summary);
+    form.append("description", formData.description);
+    form.append("imageCover", formData.imageCover);
+    form.append("startLocation[address]", formData.startLocation.address);
+    form.append(
+      "startLocation[description]",
+      formData.startLocation.description
+    );
+
+    for (let i = 0; i < formData.images.length; i++) {
+      form.append("images", formData.images[i]);
+    }
+
+    dates.forEach((date) => form.append("startDates", date));
+
     try {
-      form.append("name", formData.name);
-      form.append("duration", formData.duration);
-      form.append("maxGroupSize", formData.maxGroupSize);
-      form.append("price", formData.price);
-      form.append("priceDiscount", formData.priceDiscount);
-      form.append("summary", formData.summary);
-      form.append("description", formData.description);
-      form.append("imageCover", formData.imageCover);
-      form.append("startLocation[address]", formData.startLocation.address);
-      form.append(
-        "startLocation[description]",
-        formData.startLocation.description
-      );
-
-      for (let i = 0; i < formData.images.length; i++) {
-        form.append("images", formData.images[i]);
-      }
-
-      dates.forEach((date) => form.append("startDates", date));
-
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}tours/create`,
         {
@@ -173,6 +173,7 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
+                min="1"
                 required
               />
               <input
@@ -181,6 +182,7 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giá (VND)"
                 className={inputClass}
+                min="0"
                 required
               />
               <input
@@ -189,13 +191,15 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giảm giá (%)"
                 className={inputClass}
+                min="0"
+                max="100"
               />
-
               <input
                 name="address"
                 onChange={handleChange}
                 placeholder="Địa chỉ xuất phát"
                 className={inputClass}
+                required
               />
               <input
                 name="descriptionStart"
@@ -215,6 +219,7 @@ const CreateTour = () => {
                       imageCover: e.target.files[0],
                     }))
                   }
+                  required
                 />
               </div>
 
@@ -303,6 +308,7 @@ const inputClass =
 const textareaClass =
   "w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm min-h-[120px]";
 
+// Ẩn input trong DatePicker
 const style = document.createElement("style");
 style.innerHTML = `
   .custom-calendar input.rmdp-input {

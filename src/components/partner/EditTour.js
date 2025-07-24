@@ -144,6 +144,7 @@ const EditTour = () => {
             value={formData.duration}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="1"
             required
           />
         </div>
@@ -159,6 +160,7 @@ const EditTour = () => {
             value={formData.maxGroupSize}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="1"
             required
           />
         </div>
@@ -187,6 +189,7 @@ const EditTour = () => {
             value={formData.price}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="0"
             required
           />
         </div>
@@ -200,6 +203,8 @@ const EditTour = () => {
             value={formData.priceDiscount}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="0"
+            max="100"
           />
         </div>
 
