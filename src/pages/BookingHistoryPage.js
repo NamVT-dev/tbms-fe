@@ -109,7 +109,7 @@ const BookingHistoryPage = () => {
 
                 {booking.tour?.description && (
                   <p className="text-sm text-gray-500 mt-3">
-                    <strong>Mô tả:</strong> {booking.tour.description}
+                    <strong>Mô tả:</strong> {booking.tour.summary}
                   </p>
                 )}
 
