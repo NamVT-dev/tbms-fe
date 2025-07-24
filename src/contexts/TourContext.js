@@ -4,7 +4,6 @@ import { getTours } from "../services/api";
 const TourContext = createContext({
   tours: [],
   loading: true,
-  searchTours: () => {},
 });
 
 const TourProvider = ({ children }) => {
@@ -27,12 +26,8 @@ const TourProvider = ({ children }) => {
     fetchTours();
   }, []);
 
-  const searchTours = (params) => {
-    fetchTours(params);
-  };
-
   return (
-    <TourContext.Provider value={{ tours, loading, searchTours }}>
+    <TourContext.Provider value={{ tours, loading }}>
       {children}
     </TourContext.Provider>
   );
