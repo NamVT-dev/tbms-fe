@@ -130,6 +130,7 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
+                min="1"
                 required
               />
               <input
@@ -138,6 +139,7 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giá (VND)"
                 className={inputClass}
+                min="0"
                 required
               />
               <input
@@ -146,6 +148,8 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giảm giá (%)"
                 className={inputClass}
+                min="0"
+                max="100"
               />
 
               <input
@@ -154,6 +158,7 @@ const CreateTour = () => {
                 placeholder="Địa chỉ xuất phát"
                 className={inputClass}
               />
+
               <input
                 name="descriptionStart"
                 onChange={handleChange}
