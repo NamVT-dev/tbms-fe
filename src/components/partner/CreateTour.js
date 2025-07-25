@@ -8,6 +8,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css"; // theme đẹp hơn
 import MapSelector from "./MapSelector";
+import { duration } from "@mui/material/styles";
 
 const CreateTour = () => {
   const [formData, setFormData] = useState({
@@ -65,6 +66,12 @@ const CreateTour = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!dates || dates.length === 0) {
+      alert("Vui lòng chọn ít nhất một ngày.");
+      return;
+    }
+
     const form = new FormData();
     try {
       form.append("name", formData.name);
@@ -91,6 +98,8 @@ const CreateTour = () => {
       );
 
       formData.locations.forEach((location, index) => {
+        if (location.day > duration)
+          alert("Ngày trong chuyến đi đã vượt quá thời gian chuyến đi");
         form.append(`locations[${index}][description]`, location.description);
         form.append(`locations[${index}][address]`, location.address);
         if (location.coordinates?.length > 1) {
@@ -103,6 +112,7 @@ const CreateTour = () => {
             location.coordinates[1]
           );
         }
+        form.append(`locations[${index}][day]`, location.day);
       });
 
       for (let i = 0; i < formData.images.length; i++) {
@@ -170,7 +180,7 @@ const CreateTour = () => {
                 required
               />
               <input
-                type="text"
+                type="number"
                 name="duration"
                 placeholder="Thời gian (số ngày)"
                 onChange={handleChange}
@@ -370,6 +380,7 @@ const CreateTour = () => {
                     onlyCalendar
                     multiple
                     format="YYYY-MM-DD"
+                    minDate={new Date()}
                     className="rmdp-prime custom-calendar"
                   />
                 </div>

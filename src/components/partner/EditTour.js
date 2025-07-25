@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import ReactQuill from "react-quill";
 import { useNavigate, useParams } from "react-router-dom";
+
+import "react-quill/dist/quill.snow.css";
 
 const EditTour = () => {
   const { id } = useParams();
@@ -48,6 +51,9 @@ const EditTour = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (formData.status === "active") {
+        formData.status = undefined;
+      }
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -163,7 +169,7 @@ const EditTour = () => {
 
         {/* Giảm giá */}
         <div>
-          <label className="text-gray-700 font-semibold">Giảm giá (VND)</label>
+          <label className="text-gray-700 font-semibold">Giảm giá (%)</label>
           <input
             type="number"
             name="priceDiscount"
@@ -188,16 +194,19 @@ const EditTour = () => {
         </div>
 
         {/* Mô tả chi tiết */}
-        <div className="col-span-2">
-          <label className="text-gray-700 font-semibold">Mô tả chi tiết</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-            required
-          />
-        </div>
+        <ReactQuill
+          id="tourDescription"
+          className="md:col-span-2 mb-20"
+          theme="snow"
+          placeholder="Nhập mô tả chi tiết tour tại đây..."
+          value={formData.description}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              description: value,
+            }))
+          }
+        />
 
         <div className="col-span-2 flex gap-4 mt-6">
           <button
