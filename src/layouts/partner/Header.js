@@ -16,7 +16,7 @@ const Header = ({ setSidebarOpen }) => {
           <div className="flex items-center flex-1">
             <button
               className="text-gray-500 hover:text-gray-600 lg:hidden"
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => {}}
             >
               <Bars3Icon className="w-6 h-6" />
             </button>

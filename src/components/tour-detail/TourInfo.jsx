@@ -142,7 +142,8 @@ const TourInfo = ({ tour, onSelectLocation }) => {
               <li className="flex items-center gap-3">
                 <FaClock className="text-cyan-500" size={20} />
                 <span>
-                  <strong>Thời gian:</strong> {tour.duration}
+                  <strong>Thời gian:</strong> {tour.duration} NGÀY{" "}
+                  {tour.duration - 1} ĐÊM
                 </span>
               </li>
               <li className="flex items-center gap-3">

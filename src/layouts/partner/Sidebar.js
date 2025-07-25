@@ -58,7 +58,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
         >
           fvivu
         </Link>
-        <button className="p-2 lg:hidden" onClick={() => setSidebarOpen(false)}>
+        <button className="p-2 lg:hidden" onClick={() => {}}>
           <svg
             className="w-6 h-6 text-gray-600"
             fill="none"

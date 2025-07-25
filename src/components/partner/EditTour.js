@@ -16,6 +16,7 @@ const EditTour = () => {
     summary: "",
     description: "",
     imageCover: "",
+    images: [],
     status: "pending",
   });
 
@@ -50,14 +51,25 @@ const EditTour = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const form = new FormData();
     try {
       if (formData.status === "active") {
         formData.status = undefined;
       }
+      form.append("name", formData.name);
+      form.append("duration", formData.duration);
+      form.append("maxGroupSize", formData.maxGroupSize);
+      form.append("price", formData.price);
+      form.append("summary", formData.summary);
+      form.append("description", formData.description);
+      form.append("imageCover", formData.imageCover);
+      for (let i = 0; i < formData.images.length; i++) {
+        form.append("images", formData.images[i]);
+      }
+
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: form,
         credentials: "include",
       });
 
@@ -86,6 +98,19 @@ const EditTour = () => {
             alt="Ảnh Tour"
             className="w-40 h-28 rounded-lg mx-auto shadow-md"
           />
+        </div>
+      )}
+
+      {formData.images && formData.images.length > 0 && (
+        <div className="grid grid-cols-3 gap-4 my-4">
+          {formData.images.map((img, idx) => (
+            <img
+              key={idx}
+              src={img}
+              alt={`Ảnh phụ ${idx + 1}`}
+              className="w-full h-28 object-cover rounded shadow-md"
+            />
+          ))}
         </div>
       )}
 
@@ -162,22 +187,8 @@ const EditTour = () => {
             value={formData.price}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-            min="0"
+            min="1"
             required
-          />
-        </div>
-
-        {/* Giảm giá */}
-        <div>
-          <label className="text-gray-700 font-semibold">Giảm giá (%)</label>
-          <input
-            type="number"
-            name="priceDiscount"
-            value={formData.priceDiscount}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-            min="0"
-            max="100"
           />
         </div>
 
@@ -190,6 +201,54 @@ const EditTour = () => {
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
             required
+          />
+        </div>
+
+        {/* Ảnh bìa */}
+        <div className="col-span-2">
+          <label className="text-gray-700 font-semibold">
+            Cập nhật ảnh chính
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                // Hiển thị ảnh preview
+                const imageUrl = URL.createObjectURL(file);
+                setFormData((prev) => ({
+                  ...prev,
+                  imageCover: imageUrl,
+                }));
+                // Nếu muốn gửi file gốc thay vì base64 URL:
+                // setFormData(prev => ({ ...prev, imageCoverFile: file }));
+              }
+            }}
+            className="w-full mt-2"
+          />
+        </div>
+
+        {/* Ảnh phụ */}
+        <div className="col-span-2">
+          <label className="text-gray-700 font-semibold">
+            Cập nhật ảnh phụ
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files);
+              const imageURLs = files.map((file) => URL.createObjectURL(file));
+
+              setFormData((prev) => ({
+                ...prev,
+                images: imageURLs, // dùng để preview
+                imagesFiles: files, // dùng để gửi server nếu cần
+              }));
+            }}
+            className="w-full mt-2"
           />
         </div>
 

@@ -16,7 +16,6 @@ const CreateTour = () => {
     duration: "",
     maxGroupSize: "",
     price: "",
-    priceDiscount: "",
     summary: "",
     description: "",
     imageCover: null,
@@ -38,16 +37,12 @@ const CreateTour = () => {
     status: "pending",
   });
 
-  const [finalPrice, setFinalPrice] = useState(0);
   const [dates, setDates] = useState([]);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [previewCover, setPreviewCover] = useState(null);
+  const [previewImages, setPreviewImages] = useState([]);
 
-  useEffect(() => {
-    const price = parseFloat(formData.price) || 0;
-    const discount = parseFloat(formData.priceDiscount) || 0;
-    const discountedPrice = price - (price * discount) / 100;
-    setFinalPrice(discountedPrice > 0 ? discountedPrice : 0);
-  }, [formData.price, formData.priceDiscount]);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -201,14 +196,8 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giá (VND)"
                 className={inputClass}
+                min="1"
                 required
-              />
-              <input
-                name="priceDiscount"
-                onChange={handleChange}
-                type="number"
-                placeholder="Giảm giá (%)"
-                className={inputClass}
               />
               <div className="md:col-span-2">
                 <h3>🗺️ Vị trí xuất phát</h3>
@@ -327,27 +316,63 @@ const CreateTour = () => {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file && !file.type.startsWith("image/")) {
+                      alert("Chỉ chấp nhận ảnh!");
+                      return;
+                    }
                     setFormData((prev) => ({
                       ...prev,
-                      imageCover: e.target.files[0],
-                    }))
-                  }
+                      imageCover: file,
+                    }));
+                    setPreviewCover(URL.createObjectURL(file));
+                  }}
                 />
               </div>
+              {previewCover && (
+                <img
+                  src={previewCover}
+                  alt="Preview cover"
+                  className="mt-2 w-40 h-28 object-cover rounded border"
+                />
+              )}
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh phụ (nhiều)</label>
                 <input
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    const validImages = files.filter((f) =>
+                      f.type.startsWith("image/")
+                    );
+                    if (validImages.length !== files.length) {
+                      alert("Một số file không phải ảnh đã bị loại bỏ.");
+                    }
                     setFormData((prev) => ({
                       ...prev,
-                      images: e.target.files,
-                    }))
-                  }
+                      images: validImages,
+                    }));
+                    const previews = validImages.map((file) =>
+                      URL.createObjectURL(file)
+                    );
+                    setPreviewImages(previews);
+                  }}
                 />
+                {previewImages.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {previewImages.map((src, idx) => (
+                      <img
+                        key={idx}
+                        src={src}
+                        alt={`Preview ${idx}`}
+                        className="w-24 h-20 object-cover rounded border"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
               <textarea
                 name="summary"
@@ -384,10 +409,6 @@ const CreateTour = () => {
                     className="rmdp-prime custom-calendar"
                   />
                 </div>
-              </div>
-              <div className="md:col-span-2 text-right text-indigo-700 font-medium">
-                💸 Giá sau giảm:{" "}
-                <strong>{finalPrice.toLocaleString()} VND</strong>
               </div>
               <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-4">
                 <button
