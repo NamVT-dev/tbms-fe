@@ -4,7 +4,7 @@ import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
 import ReactQuill from "react-quill";
-
+import { FaRegCalendarAlt } from "react-icons/fa";
 import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css"; // theme đẹp hơn
 import MapSelector from "./MapSelector";
@@ -373,7 +373,7 @@ const CreateTour = () => {
                 <label className="text-sm text-gray-600 mb-2 block">
                   Ngày khởi hành (có thể chọn nhiều)
                 </label>
-                <div className="bg-white p-4 rounded-xl shadow w-fit">
+                <div className="relative w-full">
                   <DatePicker
                     value={dates}
                     onChange={setDates}
@@ -381,9 +381,12 @@ const CreateTour = () => {
                     multiple
                     format="YYYY-MM-DD"
                     minDate={new Date()}
-                    className="rmdp-prime custom-calendar"
+                    containerClassName="w-full"
+                    inputClass="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm"
                   />
+                  <FaRegCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
+
               </div>
               <div className="md:col-span-2 text-right text-indigo-700 font-medium">
                 💸 Giá sau giảm:{" "}

@@ -84,14 +84,12 @@ const EditTour = () => {
     }
 
     try {
-<<<<<<< HEAD
-      const response = await fetch(`http://localhost:9999/tours/update/${id}`, {
-=======
+
       if (formData.status === "active") {
         formData.status = undefined;
       }
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
->>>>>>> d1df30f19a2c81b9ab7d4ce4604e2b672d5ffd4f
+
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
