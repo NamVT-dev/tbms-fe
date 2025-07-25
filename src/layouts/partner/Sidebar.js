@@ -41,6 +41,19 @@ const navigation = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
 
+  const handleLogOut = async () => {
+    try {
+      await fetch("http://localhost:9999/auth/logout", {
+        method: "GET",
+        credentials: "include",
+      });
+      window.location.href = "/";
+    } catch (error) {
+      console.log(error);
+      alert("Có lỗi khi đăng xuất");
+    }
+  };
+
   return (
     <aside
       className={`
@@ -104,10 +117,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
         {/* Đăng xuất */}
         <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/";
-          }}
+          onClick={handleLogOut}
           className="flex items-center px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 rounded-lg mt-4"
         >
           <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3 text-red-500" />

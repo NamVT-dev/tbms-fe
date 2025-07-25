@@ -19,6 +19,7 @@ const EditTour = () => {
     images: [],
     status: "pending",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -53,6 +54,7 @@ const EditTour = () => {
     e.preventDefault();
     const form = new FormData();
     try {
+      setIsLoading(true);
       if (formData.status === "active") {
         formData.status = undefined;
       }
@@ -81,6 +83,8 @@ const EditTour = () => {
       }
     } catch (error) {
       console.error("Lỗi cập nhật tour:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -166,16 +170,19 @@ const EditTour = () => {
         {/* Trạng thái Tour */}
         <div>
           <label className="text-gray-700 font-semibold">Trạng thái Tour</label>
-          <select
+          <input
+            type="text"
             name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="pending">Chờ duyệt</option>
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Không hoạt động</option>
-          </select>
+            value={
+              formData.status === "active"
+                ? "Đang hoạt động"
+                : formData.status === "pending"
+                  ? "Đang chờ phê duyệt"
+                  : "Không hoạt động"
+            }
+            readOnly
+            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+          />
         </div>
 
         {/* Giá */}
@@ -288,8 +295,9 @@ const EditTour = () => {
           <button
             type="submit"
             className="flex-1 bg-blue-600 text-white font-bold p-3 rounded-lg hover:bg-blue-700 transition"
+            disabled={isLoading}
           >
-            ✔️ Cập Nhật Tour
+            {!isLoading ? "✔️ Cập Nhật Tour" : "Đang lưu..."}
           </button>
         </div>
       </form>

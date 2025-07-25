@@ -38,7 +38,7 @@ const CreateTour = () => {
   });
 
   const [dates, setDates] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [previewCover, setPreviewCover] = useState(null);
   const [previewImages, setPreviewImages] = useState([]);
 
@@ -69,6 +69,7 @@ const CreateTour = () => {
 
     const form = new FormData();
     try {
+      setIsLoading(true);
       form.append("name", formData.name);
       form.append("duration", formData.duration);
       form.append("maxGroupSize", formData.maxGroupSize);
@@ -133,6 +134,8 @@ const CreateTour = () => {
       }
     } catch (error) {
       console.error("Lỗi:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -414,8 +417,9 @@ const CreateTour = () => {
                 <button
                   type="submit"
                   className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700"
+                  disabled={isLoading}
                 >
-                  🚀 Tạo Tour
+                  {!isLoading ? "🚀 Tạo Tour" : "Đang lưu..."}
                 </button>
                 <button
                   type="button"
