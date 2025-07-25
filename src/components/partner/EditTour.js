@@ -214,6 +214,10 @@ const EditTour = () => {
             accept="image/*"
             onChange={(e) => {
               const file = e.target.files[0];
+              if (file && !file.type.startsWith("image/")) {
+                alert("Chỉ chấp nhận ảnh!");
+                return;
+              }
               if (file) {
                 // Hiển thị ảnh preview
                 const imageUrl = URL.createObjectURL(file);
@@ -221,8 +225,6 @@ const EditTour = () => {
                   ...prev,
                   imageCover: imageUrl,
                 }));
-                // Nếu muốn gửi file gốc thay vì base64 URL:
-                // setFormData(prev => ({ ...prev, imageCoverFile: file }));
               }
             }}
             className="w-full mt-2"
@@ -240,7 +242,15 @@ const EditTour = () => {
             multiple
             onChange={(e) => {
               const files = Array.from(e.target.files);
-              const imageURLs = files.map((file) => URL.createObjectURL(file));
+              const validImages = files.filter((f) =>
+                f.type.startsWith("image/")
+              );
+              if (validImages.length !== files.length) {
+                alert("Một số file không phải ảnh đã bị loại bỏ.");
+              }
+              const imageURLs = validImages.map((file) =>
+                URL.createObjectURL(file)
+              );
 
               setFormData((prev) => ({
                 ...prev,
