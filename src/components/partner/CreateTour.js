@@ -386,25 +386,47 @@ const CreateTour = () => {
                     if (validImages.length !== files.length) {
                       alert("Một số file không phải ảnh đã bị loại bỏ.");
                     }
+
+                    const newFormImages = [...formData.images, ...validImages];
+                    const newPreviewImages = [
+                      ...previewImages,
+                      ...validImages.map((file) => URL.createObjectURL(file)),
+                    ];
+
                     setFormData((prev) => ({
                       ...prev,
-                      images: validImages,
+                      images: newFormImages,
                     }));
-                    const previews = validImages.map((file) =>
-                      URL.createObjectURL(file)
-                    );
-                    setPreviewImages(previews);
+                    setPreviewImages(newPreviewImages);
                   }}
                 />
                 {previewImages.length > 0 && (
                   <div className="mt-2 flex flex-wrap gap-2">
                     {previewImages.map((src, idx) => (
-                      <img
-                        key={idx}
-                        src={src}
-                        alt={`Preview ${idx}`}
-                        className="w-24 h-20 object-cover rounded border"
-                      />
+                      <div key={idx} className="relative group">
+                        <img
+                          src={src}
+                          alt={`Preview ${idx}`}
+                          className="w-24 h-20 object-cover rounded border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newImages = [...formData.images];
+                            const newPreviews = [...previewImages];
+                            newImages.splice(idx, 1);
+                            newPreviews.splice(idx, 1);
+                            setFormData((prev) => ({
+                              ...prev,
+                              images: newImages,
+                            }));
+                            setPreviewImages(newPreviews);
+                          }}
+                          className="absolute top-[-8px] right-[-8px] bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center hover:bg-red-700"
+                        >
+                          ×
+                        </button>
+                      </div>
                     ))}
                   </div>
                 )}

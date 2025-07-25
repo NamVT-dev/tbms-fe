@@ -229,10 +229,6 @@ const TourInfo = ({ tour, onSelectLocation }) => {
                 Tổng giá: {totalPrice.toLocaleString()} đ
               </p>
             </div>
-          </div>
-
-          {/* Nút đặt tour */}
-          <div className="text-center mt-6">
             <button
               onClick={handleBookingClick}
               className="w-full bg-cyan-500 hover:bg-cyan-700 text-white px-6 py-3 rounded-xl text-lg transition"
