@@ -296,7 +296,7 @@ const EditTour = () => {
           <label className="text-sm text-gray-600 mb-2 block">
             Ngày khởi hành (có thể chọn nhiều)
           </label>
-          <div className="bg-white p-4 rounded-xl shadow w-fit">
+          <div className="relative w-full">
             <DatePicker
               value={formData.startDates}
               onChange={(value) =>
@@ -309,7 +309,8 @@ const EditTour = () => {
               multiple
               format="YYYY-MM-DD"
               minDate={new Date()}
-              className="rmdp-prime custom-calendar"
+              containerClassName="w-full"
+              inputClass="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm"
             />
           </div>
         </div>

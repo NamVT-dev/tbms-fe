@@ -4,7 +4,7 @@ import Header from "../../layouts/partner/Header";
 
 const BookingList = () => {
   const [bookings, setBookings] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -29,7 +29,7 @@ const BookingList = () => {
   }, []);
 
   const filteredBookings = bookings.filter(
-    (booking) => filterStatus === "all" || booking.status === filterStatus
+    (booking) => filterStatus === "All" || booking.paid === filterStatus
   );
 
   return (
@@ -47,22 +47,17 @@ const BookingList = () => {
 
           <div className="flex justify-center flex-wrap gap-2 mb-6">
             {[
-              { label: "Tất cả", value: "all" },
-              { label: "Chờ duyệt", value: "pending" },
-              { label: "Đã xác nhận", value: "confirmed" },
-              { label: "Đã hủy", value: "cancelled" },
+              { label: "Tất cả", value: "All" },
+              { label: "Đã thanh toán", value: true },
+              { label: "Chưa thanh toán", value: false },
             ].map(({ label, value }) => (
               <button
                 key={value}
                 className={`px-4 py-2 rounded-lg font-medium transition shadow-sm ${
                   filterStatus === value
-                    ? value === "pending"
-                      ? "bg-yellow-500 text-white"
-                      : value === "confirmed"
-                        ? "bg-green-600 text-white"
-                        : value === "cancelled"
-                          ? "bg-red-600 text-white"
-                          : "bg-gray-800 text-white"
+                    ? value
+                      ? "bg-green-600 text-white"
+                      : "bg-red-600 text-white"
                     : "bg-gray-200 text-gray-800"
                 }`}
                 onClick={() => setFilterStatus(value)}
@@ -89,8 +84,8 @@ const BookingList = () => {
                 {filteredBookings.map((booking, index) => (
                   <tr key={index} className="border-b hover:bg-gray-50">
                     <td className="px-3 py-2">{index + 1}</td>
-                    <td>{booking.customer?.name || "-"}</td>
-                    <td>{booking.customer?.email || "-"}</td>
+                    <td>{booking.user?.name || "-"}</td>
+                    <td>{booking.user?.email || "-"}</td>
                     <td>{booking.tour?.name || "-"}</td>
                     <td className="text-green-700 font-medium">
                       {booking.price?.toLocaleString("vi-VN", {
@@ -99,25 +94,17 @@ const BookingList = () => {
                       }) || "0 VND"}
                     </td>
                     <td>
-                      {booking.bookedAt
-                        ? new Date(booking.bookedAt).toLocaleDateString()
+                      {booking.createdAt
+                        ? new Date(booking.createdAt).toLocaleDateString()
                         : "-"}
                     </td>
                     <td>
                       <span
                         className={`px-2 py-1 rounded-md text-white text-xs font-medium ${
-                          booking.status === "confirmed"
-                            ? "bg-green-600"
-                            : booking.status === "pending"
-                              ? "bg-yellow-500"
-                              : "bg-red-600"
+                          booking.paid ? "bg-green-600" : "bg-red-600"
                         }`}
                       >
-                        {booking.status === "confirmed"
-                          ? "Đã xác nhận"
-                          : booking.status === "pending"
-                            ? "Chờ duyệt"
-                            : "Đã hủy"}
+                        {booking.paid ? "Đã thanh toán" : "Chưa thanh toán"}
                       </span>
                     </td>
                   </tr>
