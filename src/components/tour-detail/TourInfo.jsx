@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import ResponsiveDatePickers from "../tour-detail/ResponsiveDatePickers";
 import TiptapEditor from "../tour-detail/TiptapEditor";
 import { getBookingSession } from "../../services/api";
+import axios from "axios";
 
 const TourInfo = ({ tour, onSelectLocation }) => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -39,7 +40,7 @@ const TourInfo = ({ tour, onSelectLocation }) => {
     }
   };
 
-  const handleBookingClick = () => {
+  const handleBookingClick = async () => {
     if (totalPrice > 99999999) {
       alert(
         "Giá trị hóa đơn tối đa có thể đặt: 99,999,999đ! Vui lòng đặt lại."
@@ -57,6 +58,25 @@ const TourInfo = ({ tour, onSelectLocation }) => {
       alert("Ngày khởi hành không hợp lệ.");
       return;
     }
+
+    let remainSlot = 0;
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}tours/${tour.id}/remaining-slots`,
+        {
+          startDate: selectedDate,
+        }
+      );
+      remainSlot = res.data.data.remainingSlots;
+    } catch (error) {
+      alert("Lỗi khi lấy dữ liệu tour");
+    }
+
+    if (remainSlot < numAdults) {
+      alert(`Tour chỉ còn ${remainSlot} chỗ. Xin hãy đặt lại`);
+      return;
+    }
+
     setIsModalOpen(true);
   };
 
