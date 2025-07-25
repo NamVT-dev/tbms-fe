@@ -3,6 +3,7 @@ import ReactQuill from "react-quill";
 import { useNavigate, useParams } from "react-router-dom";
 
 import "react-quill/dist/quill.snow.css";
+import DatePicker from "react-multi-date-picker";
 
 const EditTour = () => {
   const { id } = useParams();
@@ -18,7 +19,11 @@ const EditTour = () => {
     imageCover: "",
     images: [],
     status: "pending",
+    startDates: [],
   });
+
+  const [previewCover, setPreviewCover] = useState("");
+  const [previewImages, setPreviewImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -68,6 +73,7 @@ const EditTour = () => {
       for (let i = 0; i < formData.images.length; i++) {
         form.append("images", formData.images[i]);
       }
+      formData.startDates?.forEach((date) => form.append("startDates", date));
 
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
         method: "PATCH",
@@ -95,19 +101,19 @@ const EditTour = () => {
       </h2>
 
       {/* Hiển thị ảnh hiện tại */}
-      {formData.imageCover && (
+      {previewCover && (
         <div className="text-center my-4">
           <img
-            src={formData.imageCover}
+            src={previewCover}
             alt="Ảnh Tour"
             className="w-40 h-28 rounded-lg mx-auto shadow-md"
           />
         </div>
       )}
 
-      {formData.images && formData.images.length > 0 && (
+      {previewImages && previewImages.length > 0 && (
         <div className="grid grid-cols-3 gap-4 my-4">
-          {formData.images.map((img, idx) => (
+          {previewImages.map((img, idx) => (
             <img
               key={idx}
               src={img}
@@ -194,7 +200,8 @@ const EditTour = () => {
             value={formData.price}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-            min="1"
+            min="20000"
+            max="99999999"
             required
           />
         </div>
@@ -228,9 +235,10 @@ const EditTour = () => {
               if (file) {
                 // Hiển thị ảnh preview
                 const imageUrl = URL.createObjectURL(file);
+                setPreviewCover(imageUrl);
                 setFormData((prev) => ({
                   ...prev,
-                  imageCover: imageUrl,
+                  imageCover: file,
                 }));
               }
             }}
@@ -259,10 +267,11 @@ const EditTour = () => {
                 URL.createObjectURL(file)
               );
 
+              setPreviewImages(imageURLs);
+
               setFormData((prev) => ({
                 ...prev,
-                images: imageURLs, // dùng để preview
-                imagesFiles: files, // dùng để gửi server nếu cần
+                images: files,
               }));
             }}
             className="w-full mt-2"
@@ -283,6 +292,27 @@ const EditTour = () => {
             }))
           }
         />
+        <div className="md:col-span-2">
+          <label className="text-sm text-gray-600 mb-2 block">
+            Ngày khởi hành (có thể chọn nhiều)
+          </label>
+          <div className="bg-white p-4 rounded-xl shadow w-fit">
+            <DatePicker
+              value={formData.startDates}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  startDates: value,
+                }))
+              }
+              onlyCalendar
+              multiple
+              format="YYYY-MM-DD"
+              minDate={new Date()}
+              className="rmdp-prime custom-calendar"
+            />
+          </div>
+        </div>
 
         <div className="col-span-2 flex gap-4 mt-6">
           <button

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
@@ -18,7 +18,7 @@ const CreateTour = () => {
     price: "",
     summary: "",
     description: "",
-    imageCover: null,
+    imageCover: "",
     images: [],
     startLocation: {
       address: "",
@@ -62,6 +62,21 @@ const CreateTour = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (
+      !formData.startLocation.coordinates ||
+      formData.startLocation.coordinates.length !== 2
+    ) {
+      alert("Vui lòng chọn tọa độ cho điểm xuất phát.");
+      return;
+    }
+
+    for (let i = 0; i < formData.locations.length; i++) {
+      const loc = formData.locations[i];
+      if (!loc.coordinates || loc.coordinates.length !== 2) {
+        alert(`Vui lòng chọn tọa độ cho vị trí trung gian #${i + 1}.`);
+        return;
+      }
+    }
     if (!dates || dates.length === 0) {
       alert("Vui lòng chọn ít nhất một ngày.");
       return;
@@ -199,7 +214,8 @@ const CreateTour = () => {
                 type="number"
                 placeholder="Giá (VND)"
                 className={inputClass}
-                min="1"
+                min="20000"
+                max="99999999"
                 required
               />
               <div className="md:col-span-2">
@@ -243,8 +259,22 @@ const CreateTour = () => {
                 {formData.locations.map((loc, index) => (
                   <div
                     key={index}
-                    className="mb-6 p-4 border border-gray-300 rounded-xl bg-gray-50"
+                    className="mb-6 p-4 border border-gray-300 rounded-xl bg-gray-50 relative"
                   >
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 text-red-500 text-sm hover:underline"
+                      onClick={() => {
+                        const newLocations = [...formData.locations];
+                        newLocations.splice(index, 1);
+                        setFormData((prev) => ({
+                          ...prev,
+                          locations: newLocations,
+                        }));
+                      }}
+                    >
+                      ❌ Xóa
+                    </button>
                     <label className="text-sm text-gray-600 block mb-1">
                       📍 Chọn vị trí #{index + 1}
                     </label>
@@ -283,6 +313,7 @@ const CreateTour = () => {
                           locations: newLocations,
                         }));
                       }}
+                      required
                     />
                     <input
                       type="number"
@@ -301,6 +332,7 @@ const CreateTour = () => {
                           locations: newLocations,
                         }));
                       }}
+                      required
                     />
                   </div>
                 ))}

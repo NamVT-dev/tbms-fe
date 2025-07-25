@@ -40,6 +40,12 @@ const TourInfo = ({ tour, onSelectLocation }) => {
   };
 
   const handleBookingClick = () => {
+    if (totalPrice > 99999999) {
+      alert(
+        "Giá trị hóa đơn tối đa có thể đặt: 99,999,999đ! Vui lòng đặt lại."
+      );
+      return;
+    }
     const isValidDate = tour?.startDates?.some((date) =>
       dayjs(date).isSame(selectedDate, "day")
     );
