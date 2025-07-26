@@ -28,10 +28,7 @@ const Header = ({ setSidebarOpen }) => {
             </button>
             <Link to="/partner/profile" className="flex items-center">
               <UserCircleIcon className="w-8 h-8 text-gray-400" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700">Tên công ty</p>
-                <p className="text-xs text-gray-500">Partner</p>
-              </div>
+              
             </Link>
           </div>
         </div>
