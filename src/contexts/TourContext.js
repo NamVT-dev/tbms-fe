@@ -4,12 +4,12 @@ import { getTours } from "../services/api";
 const TourContext = createContext({
   tours: [],
   loading: true,
+  searchTours: () => {},
 });
 
 const TourProvider = ({ children }) => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const fetchTours = async (params = {}) => {
     try {
       setLoading(true);
@@ -22,12 +22,26 @@ const TourProvider = ({ children }) => {
     }
   };
 
+  const searchTours = async (params) => {
+    const cleanParams = Object.fromEntries(
+      Object.entries({
+        sort: params.sort || "-createdAt",
+        search: params.search || "",
+        rating: params.rating,
+        minPrice: params.minPrice,
+        maxPrice: params.maxPrice,
+      }).filter(([_, v]) => v !== undefined && v !== "")
+    );
+
+    await fetchTours(cleanParams);
+  };
+
   useEffect(() => {
     fetchTours();
   }, []);
 
   return (
-    <TourContext.Provider value={{ tours, loading }}>
+    <TourContext.Provider value={{ tours, loading, searchTours }}>
       {children}
     </TourContext.Provider>
   );
