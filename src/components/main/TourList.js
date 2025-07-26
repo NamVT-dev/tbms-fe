@@ -24,6 +24,14 @@ const TourList = ({ tours: propTours, paginated = true }) => {
     if (slug) navigate(`/tour-detail/${slug}`);
   };
 
+  if (tours.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p className="text-gray-500 text-lg">Không tìm thấy tour</p>
+      </div>
+    );
+  }
+
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4">

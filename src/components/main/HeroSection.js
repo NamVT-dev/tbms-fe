@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import { TourContext } from "../../contexts/TourContext";
 
 const HeroSection = () => {
@@ -7,6 +7,7 @@ const HeroSection = () => {
   const [price, setPrice] = useState("");
   const [ratingsAverage, setRatingsAverage] = useState("");
   const [isSearched, setIsSearched] = useState(false);
+  const listRef = useRef(null);
 
   const handleSearch = () => {
     const [minPrice, maxPrice] = price ? price.split("-") : [null, null];
@@ -23,6 +24,10 @@ const HeroSection = () => {
 
     searchTours(params);
     setIsSearched(true);
+
+    setTimeout(() => {
+      listRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
   return (
     <>
@@ -147,7 +152,7 @@ const HeroSection = () => {
                     onChange={(e) => setPrice(e.target.value)}
                     className="p-3  w-full border-none rounded-2xl focus:ring-2 focus:ring-cyan-400 appearance-none"
                   >
-                    <option>Tất cả mức giá</option>
+                    <option value="">Tất cả mức giá</option>
                     <option value="0-500">Dưới 500k</option>
                     <option value="500-1000">500k - 1 triệu</option>
                     <option value="1000-9999">Trên 1 triệu</option>
@@ -181,7 +186,7 @@ const HeroSection = () => {
           </div>
         </div>
       </section>
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-white" ref={listRef}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-96">
             {/* Left Column: Title */}

@@ -26,8 +26,12 @@ const TourProvider = ({ children }) => {
     fetchTours();
   }, []);
 
+  const searchTours = (params) => {
+    fetchTours(params);
+  };
+
   return (
-    <TourContext.Provider value={{ tours, loading }}>
+    <TourContext.Provider value={{ tours, loading, searchTours }}>
       {children}
     </TourContext.Provider>
   );
