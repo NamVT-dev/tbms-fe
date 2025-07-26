@@ -5,10 +5,19 @@ import Header from "../../layouts/partner/Header";
 
 const CompanyProfile = () => {
   const [companyData, setCompanyData] = useState({
-    name: "", // tên công ty
-    description: "", // mô tả công ty
-    photo: "", // logo hoặc ảnh đại diện
+    name: "",
+    description: "",
+    photo: "",
   });
+
+  const [passwords, setPasswords] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -56,9 +65,7 @@ const CompanyProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const form = new FormData();
-
     form.append("name", companyData.name);
     form.append("description", companyData.description);
     form.append("photo", companyData.photo);
@@ -78,6 +85,49 @@ const CompanyProfile = () => {
       }
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswords({ ...passwords, [e.target.name]: e.target.value });
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        "http://localhost:9999/auth/updatePassword",
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            passwordCurrent: passwords.current,
+            password: passwords.new,
+            passwordConfirm: passwords.confirm,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Mật khẩu cập nhật thành công!");
+        setPasswords({ current: "", new: "", confirm: "" });
+      } else {
+        setError(data.message || "Lỗi đổi mật khẩu");
+        setTimeout(() => alert(data.message || "Lỗi đổi mật khẩu"), 100);
+      }
+    } catch (err) {
+      console.error("Lỗi:", err);
+      setError("Đã xảy ra lỗi");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -140,7 +190,6 @@ const CompanyProfile = () => {
                     type="file"
                     name="photo"
                     onChange={handleFileChange}
-                    placeholder="URL ảnh"
                     className="w-full p-3 border border-gray-300 rounded-lg"
                   />
                 </div>
@@ -152,6 +201,62 @@ const CompanyProfile = () => {
                 💾 Lưu Thay Đổi
               </button>
             </form>
+
+            {/* Đổi mật khẩu */}
+            <div className="mt-12 border-t pt-10">
+              <h2 className="text-2xl font-bold text-black mb-6">
+                Đổi Mật Khẩu
+              </h2>
+              <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                <div>
+                  <label className="block font-medium mb-1">
+                    Mật khẩu hiện tại
+                  </label>
+                  <input
+                    type="password"
+                    name="current"
+                    value={passwords.current}
+                    onChange={handlePasswordChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">Mật khẩu mới</label>
+                  <input
+                    type="password"
+                    name="new"
+                    value={passwords.new}
+                    onChange={handlePasswordChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <div>
+                  <label className="block font-medium mb-1">
+                    Xác nhận mật khẩu mới
+                  </label>
+                  <input
+                    type="password"
+                    name="confirm"
+                    value={passwords.confirm}
+                    onChange={handlePasswordChange}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    required
+                    minLength={8}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-semibold"
+                >
+                  {isLoading ? "Đang lưu..." : " Lưu mật khẩu"}
+                </button>
+              </form>
+              {error && <p className="text-red-500 mt-4">{error}</p>}
+            </div>
           </div>
         </div>
       </div>
