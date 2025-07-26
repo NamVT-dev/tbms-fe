@@ -123,7 +123,7 @@ const HeroSection = () => {
                     <path
                       d="M6 9L12 15L18 9"
                       strokeWidth="2"
-                      strokeLinecap="round"
+                      strokeLinecap="butt"
                       strokeLinejoin="round"
                     ></path>
                   </svg>
