@@ -110,7 +110,7 @@ const PartnerTour = () => {
                   <th className="px-3 py-2">Nhóm</th>
                   <th className="px-3 py-2">Giá Gốc</th>
                   <th className="px-3 py-2">Giảm Giá (%)</th>
-                  <th className="px-3 py-2">Giá Sau Giảm</th>
+                  
                   <th className="px-3 py-2">Điểm Bắt Đầu</th>
                   <th className="px-3 py-2">Ảnh</th>
                   <th className="px-3 py-2">Trạng Thái</th>
@@ -130,9 +130,7 @@ const PartnerTour = () => {
                     <td className="text-red-600">
                       {tour.priceDiscount ? `${tour.priceDiscount}%` : "0%"}
                     </td>
-                    <td className="text-indigo-700 font-semibold">
-                      {formatPrice(tour.finalPrice)}
-                    </td>
+                
                     <td>{tour.startLocation?.address || "Không có"}</td>
                     <td>
                       {tour.imageCover ? (

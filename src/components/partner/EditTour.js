@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
+import ReactQuill from "react-quill";
 import { useNavigate, useParams } from "react-router-dom";
+
+import "react-quill/dist/quill.snow.css";
 
 const EditTour = () => {
   const { id } = useParams();
@@ -17,6 +20,32 @@ const EditTour = () => {
   });
 
   const navigate = useNavigate();
+
+  
+  const validateForm = () => {
+    const {
+      name,
+      duration,
+      maxGroupSize,
+      price,
+      priceDiscount,
+      summary,
+      description,
+    } = formData;
+
+    if (!name.trim()) return "Tên tour không được để trống";
+    if (!duration || duration <= 0)
+      return "Thời gian tour phải lớn hơn 0";
+    if (!maxGroupSize || maxGroupSize <= 0)
+      return "Số lượng khách tối đa phải lớn hơn 0";
+    if (!price || price <= 0) return "Giá tour phải lớn hơn 0";
+    if (priceDiscount < 0 || priceDiscount > price)
+      return "Giảm giá phải từ 0 và không lớn hơn giá gốc";
+    if (!summary.trim()) return "Tóm tắt tour không được để trống";
+    if (!description.trim()) return "Mô tả chi tiết không được để trống";
+
+    return null;
+  };
 
   useEffect(() => {
     const fetchTourDetails = async () => {
@@ -47,8 +76,20 @@ const EditTour = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const error = validateForm();
+    if (error) {
+      alert(error);
+      return;
+    }
+
     try {
+
+      if (formData.status === "active") {
+        formData.status = undefined;
+      }
       const response = await fetch(`http://localhost:9999/tours/${id}`, {
+
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -111,6 +152,7 @@ const EditTour = () => {
             value={formData.duration}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="1"
             required
           />
         </div>
@@ -126,24 +168,24 @@ const EditTour = () => {
             value={formData.maxGroupSize}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="1"
             required
           />
         </div>
 
-        {/* Trạng thái Tour */}
+        {/* Địa điểm xuất phát */}
         <div>
-          <label className="text-gray-700 font-semibold">Trạng thái Tour</label>
-          <select
-            name="status"
-            value={formData.status}
+          <label className="text-gray-700 font-semibold">Địa điểm xuất phát</label>
+          <input
+            type="text"
+            name="startLocation"
+            value={formData.startLocation?.address || ""}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="pending">Chờ duyệt</option>
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Không hoạt động</option>
-          </select>
+            required
+          />
         </div>
+
 
         {/* Giá */}
         <div>
@@ -154,19 +196,22 @@ const EditTour = () => {
             value={formData.price}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="0"
             required
           />
         </div>
 
         {/* Giảm giá */}
         <div>
-          <label className="text-gray-700 font-semibold">Giảm giá (VND)</label>
+          <label className="text-gray-700 font-semibold">Giảm giá (%)</label>
           <input
             type="number"
             name="priceDiscount"
             value={formData.priceDiscount}
             onChange={handleChange}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
+            min="0"
+            max="100"
           />
         </div>
 
@@ -183,16 +228,19 @@ const EditTour = () => {
         </div>
 
         {/* Mô tả chi tiết */}
-        <div className="col-span-2">
-          <label className="text-gray-700 font-semibold">Mô tả chi tiết</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
-            required
-          />
-        </div>
+        <ReactQuill
+          id="tourDescription"
+          className="md:col-span-2 mb-20"
+          theme="snow"
+          placeholder="Nhập mô tả chi tiết tour tại đây..."
+          value={formData.description}
+          onChange={(value) =>
+            setFormData((prev) => ({
+              ...prev,
+              description: value,
+            }))
+          }
+        />
 
         <div className="col-span-2 flex gap-4 mt-6">
           <button

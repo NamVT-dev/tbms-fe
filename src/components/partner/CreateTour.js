@@ -3,8 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layouts/partner/Sidebar";
 import Header from "../../layouts/partner/Header";
 import DatePicker from "react-multi-date-picker";
-
+import ReactQuill from "react-quill";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import "react-quill/dist/quill.snow.css";
 import "react-multi-date-picker/styles/layouts/prime.css"; // theme đẹp hơn
+import MapSelector from "./MapSelector";
+import { duration } from "@mui/material/styles";
 
 const CreateTour = () => {
   const [formData, setFormData] = useState({
@@ -15,19 +19,26 @@ const CreateTour = () => {
     priceDiscount: "",
     summary: "",
     description: "",
-    imageCover: "",
+    imageCover: null,
     images: [],
     startLocation: {
       address: "",
       description: "",
+      coordinates: [],
     },
+    locations: [
+      {
+        address: "",
+        description: "",
+        coordinates: [],
+        day: "",
+      },
+    ],
     startDates: [],
     status: "pending",
   });
 
   const [finalPrice, setFinalPrice] = useState(0);
-  const [coverFile, setCoverFile] = useState(null);
-  const [imageFiles, setImageFiles] = useState([]);
   const [dates, setDates] = useState([]);
   const navigate = useNavigate();
 
@@ -53,48 +64,70 @@ const CreateTour = () => {
     }
   };
 
-  const uploadImages = async () => {
-    const form = new FormData();
-    imageFiles.forEach((img) => form.append("images", img));
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls || [];
-  };
-
-  const uploadCover = async () => {
-    if (!coverFile) return null;
-    const form = new FormData();
-    form.append("images", coverFile);
-    const res = await fetch("http://localhost:9999/upload", {
-      method: "POST",
-      body: form,
-    });
-    const data = await res.json();
-    return data.imageUrls?.[0] || null;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!dates || dates.length === 0) {
+      alert("Vui lòng chọn ít nhất một ngày.");
+      return;
+    }
+
+    const form = new FormData();
     try {
-      const imageCoverUrl = await uploadCover();
-      const otherImageUrls = await uploadImages();
+      form.append("name", formData.name);
+      form.append("duration", formData.duration);
+      form.append("maxGroupSize", formData.maxGroupSize);
+      form.append("price", formData.price);
+      form.append("summary", formData.summary);
+      form.append("description", formData.description);
+      form.append("imageCover", formData.imageCover);
+      form.append("startLocation[address]", formData.startLocation.address);
+      if (formData.startLocation.coordinates?.length > 1) {
+        form.append(
+          "startLocation[coordinates]",
+          formData.startLocation.coordinates[0]
+        );
+        form.append(
+          "startLocation[coordinates]",
+          formData.startLocation.coordinates[1]
+        );
+      }
+      form.append(
+        "startLocation[description]",
+        formData.startLocation.description
+      );
 
-      const payload = {
-        ...formData,
-        imageCover: imageCoverUrl,
-        images: otherImageUrls,
-        startDates: dates.map((d) => d.toDate()),
-      };
-
-      const res = await fetch("http://localhost:9999/tours/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
+      formData.locations.forEach((location, index) => {
+        if (location.day > duration)
+          alert("Ngày trong chuyến đi đã vượt quá thời gian chuyến đi");
+        form.append(`locations[${index}][description]`, location.description);
+        form.append(`locations[${index}][address]`, location.address);
+        if (location.coordinates?.length > 1) {
+          form.append(
+            `locations[${index}][coordinates][0]`,
+            location.coordinates[0]
+          );
+          form.append(
+            `locations[${index}][coordinates][1]`,
+            location.coordinates[1]
+          );
+        }
+        form.append(`locations[${index}][day]`, location.day);
       });
+
+      for (let i = 0; i < formData.images.length; i++) {
+        form.append("images", formData.images[i]);
+      }
+      dates.forEach((date) => form.append("startDates", date));
+
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}tours/create`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: form,
+        }
+      );
 
       const data = await res.json();
       if (res.ok) {
@@ -106,6 +139,20 @@ const CreateTour = () => {
     } catch (error) {
       console.error("Lỗi:", error);
     }
+  };
+
+  const addLocation = () => {
+    setFormData((prev) => ({
+      ...prev,
+      locations: [
+        ...prev.locations,
+        {
+          address: "",
+          description: "",
+          coordinates: [],
+        },
+      ],
+    }));
   };
 
   return (
@@ -144,7 +191,7 @@ const CreateTour = () => {
                 name="maxGroupSize"
                 onChange={handleChange}
                 type="number"
-                placeholder="Số lượng tối đa"
+                placeholder="Số lượng người tham gia tối đa"
                 className={inputClass}
                 required
               />
@@ -163,39 +210,145 @@ const CreateTour = () => {
                 placeholder="Giảm giá (%)"
                 className={inputClass}
               />
+              <div className="md:col-span-2">
+                <h3>🗺️ Vị trí xuất phát</h3>
+                <div className=" mb-6 p-4 border border-gray-300 rounded-xl bg-gray-50">
+                  <label className="text-sm text-gray-600 block mb-1">
+                    📍 Chọn vị trí xuất phát trên bản đồ
+                  </label>
+                  <MapSelector
+                    onSelect={({ lat, lng, address }) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        startLocation: {
+                          ...prev.startLocation,
+                          address,
+                          coordinates: [lng, lat],
+                        },
+                      }));
+                    }}
+                  />
+                </div>
+                {formData.startLocation.address && (
+                  <p className="text-sm text-green-700 mt-2 mb-5">
+                    ✅ Đã chọn:{" "}
+                    <strong>{formData.startLocation.address}</strong>
+                  </p>
+                )}
 
-              <input
-                name="address"
-                onChange={handleChange}
-                placeholder="Địa chỉ xuất phát"
-                className={inputClass}
-              />
-              <input
-                name="descriptionStart"
-                onChange={handleChange}
-                placeholder="Mô tả địa điểm xuất phát"
-                className={inputClass}
-              />
+                <input
+                  name="descriptionStart"
+                  onChange={handleChange}
+                  placeholder="Mô tả địa điểm xuất phát"
+                  className={inputClass}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                  🗺️ Các điểm dừng trung gian
+                </h3>
+
+                {formData.locations.map((loc, index) => (
+                  <div
+                    key={index}
+                    className="mb-6 p-4 border border-gray-300 rounded-xl bg-gray-50"
+                  >
+                    <label className="text-sm text-gray-600 block mb-1">
+                      📍 Chọn vị trí #{index + 1}
+                    </label>
+                    <MapSelector
+                      onSelect={({ lat, lng, address }) => {
+                        const newLocations = [...formData.locations];
+                        newLocations[index] = {
+                          ...newLocations[index],
+                          address,
+                          coordinates: [lng, lat],
+                        };
+                        setFormData((prev) => ({
+                          ...prev,
+                          locations: newLocations,
+                        }));
+                      }}
+                    />
+                    {loc.address && (
+                      <p className="text-sm text-green-700 mt-2">
+                        ✅ Đã chọn: <strong>{loc.address}</strong>
+                      </p>
+                    )}
+                    <input
+                      type="text"
+                      placeholder="Mô tả địa điểm"
+                      className={`${inputClass} mt-3`}
+                      value={loc.description}
+                      onChange={(e) => {
+                        const newLocations = [...formData.locations];
+                        newLocations[index] = {
+                          ...newLocations[index],
+                          description: e.target.value,
+                        };
+                        setFormData((prev) => ({
+                          ...prev,
+                          locations: newLocations,
+                        }));
+                      }}
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Ngày (trong hành trình)"
+                      className={`${inputClass} mt-3`}
+                      value={loc.day}
+                      onChange={(e) => {
+                        const newLocations = [...formData.locations];
+                        newLocations[index] = {
+                          ...newLocations[index],
+                          day: parseInt(e.target.value) || 0,
+                        };
+                        setFormData((prev) => ({
+                          ...prev,
+                          locations: newLocations,
+                        }));
+                      }}
+                    />
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addLocation}
+                  className="px-4 py-2 text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition"
+                >
+                  ➕ Thêm vị trí trung gian
+                </button>
+              </div>
 
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh bìa</label>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setCoverFile(e.target.files[0])}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      imageCover: e.target.files[0],
+                    }))
+                  }
                 />
               </div>
-
               <div className="flex flex-col">
                 <label className="text-sm text-gray-600">Ảnh phụ (nhiều)</label>
                 <input
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setImageFiles(Array.from(e.target.files))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      images: e.target.files,
+                    }))
+                  }
                 />
               </div>
-
               <textarea
                 name="summary"
                 onChange={handleChange}
@@ -203,35 +356,42 @@ const CreateTour = () => {
                 className={`${textareaClass} md:col-span-2`}
                 required
               />
-              <textarea
-                name="description"
-                onChange={handleChange}
-                placeholder="Mô tả chi tiết"
-                className={`${textareaClass} md:col-span-2`}
-                required
+              <ReactQuill
+                id="tourDescription"
+                className="md:col-span-2 mb-20"
+                theme="snow"
+                placeholder="Nhập mô tả chi tiết tour tại đây..."
+                value={formData.description}
+                onChange={(value) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: value,
+                  }))
+                }
               />
-
               <div className="md:col-span-2">
                 <label className="text-sm text-gray-600 mb-2 block">
                   Ngày khởi hành (có thể chọn nhiều)
                 </label>
-                <div className="bg-white p-4 rounded-xl shadow w-fit">
+                <div className="relative w-full">
                   <DatePicker
                     value={dates}
                     onChange={setDates}
                     onlyCalendar
                     multiple
                     format="YYYY-MM-DD"
-                    className="rmdp-prime custom-calendar"
+                    minDate={new Date()}
+                    containerClassName="w-full"
+                    inputClass="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400 text-sm"
                   />
+                  <FaRegCalendarAlt className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 </div>
-              </div>
 
+              </div>
               <div className="md:col-span-2 text-right text-indigo-700 font-medium">
                 💸 Giá sau giảm:{" "}
                 <strong>{finalPrice.toLocaleString()} VND</strong>
               </div>
-
               <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 mt-4">
                 <button
                   type="submit"

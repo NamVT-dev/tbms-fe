@@ -6,8 +6,9 @@ const LoginForm = lazy(() => import("../components/auth/LoginForm"));
 const SignUpForm = lazy(() => import("../components/auth/SignUp"));
 const TourDetailPage = lazy(() => import("../pages/TourDetailPage"));
 const BookingHistoryPage = lazy(() => import("../pages/BookingHistoryPage"));
-const ConfirmEmailForm = lazy(
-  () => import("../components/auth/ConfirmEmailForm")
+const AllToursPage = lazy(() => import("../pages/AllToursPage"));
+const ConfirmEmailForm = lazy(() =>
+  import("../components/auth/ConfirmEmailForm")
 );
 const ForgotPasswordForm = lazy(
   () => import("../components/auth/ForgotPasswordForm")
@@ -30,7 +31,7 @@ const customerRoutes = {
     { path: "reset-password", element: <ResetPasswordForm /> },
     { path: "profile", element: <UserProfile /> },
     { path: "booking-history", element: <BookingHistoryPage /> },
-    // thêm các route khác ở đây
+    { path: "all-tours", element: <AllToursPage paginated={false} /> },
   ],
 };
 
